@@ -1,6 +1,9 @@
 import React from "react";
+import styled from 'styled-components'
 
-function Login() {
+
+
+const Login = (props) => {
   return (
     <div>
       <h1>Login</h1>
