@@ -1,30 +1,53 @@
-import React from "react";
-import styled from 'styled-components'
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
+// CSS 관련 
+import { HiCheck } from 'react-icons/hi';
+import styled from 'styled-components'
 
 const Login = (props) => {
   const navigate = useNavigate()  
-  const userId = React.useRef(null)
+  const id_ref = React.useRef(null)
+  const pw_ref = React.useRef(null)
 
+  const [secureLogin, setSecureLogin] = useState(true)
+
+  const loginAction =  () => {
+
+    if (id_ref.current.value === '' || pw_ref.current.value === '') {
+      window.alert('아이디 혹은 패스워드를 정확히 입력해주세요')
+    } else {
+      window.alert('아직 기능없찌롱 ><')
+
+      const loginData = {
+        username : id_ref.current.value,
+        password : pw_ref.current.value 
+      }
+  
+      axios.post('http://localhost:5001/login-test', loginData)
+      .then(response => console.log(response))
+    }
+  }
 
   return (
     <Wrap>
       <h1>로그인</h1>
-      <input type='text' ref={userId} placeholder='아이디를 입력해주세요'></input>
-      <input type='text' ref={userId} placeholder='비밀번호를 입력해주세요'></input>
+      <input type='text' ref={id_ref} placeholder='아이디를 입력해주세요'></input>
+      <input type='password' ref={pw_ref} placeholder='비밀번호를 입력해주세요'></input>
 
       <LoginOptions>
-        <label> <input ref={userId} type='checkbox' />보안접속</label>
+        <CheckBox is_checked={secureLogin} onClick={() => setSecureLogin(!secureLogin)}><HiCheck/></CheckBox> 
+        <label> <input checked={secureLogin} onChange={() => setSecureLogin(!secureLogin)} type='checkbox' />보안접속</label>
       </LoginOptions>
 
-      <button className="loginBtn" >로그인</button>
+      <button className="loginBtn" onClick={loginAction} >로그인</button>
       <button className="joinBtn" onClick={() => navigate('/signup')}>회원가입</button>
     </Wrap>
   );
 }
 
-const Wrap = styled.div`
+const Wrap = styled.form`
   display:flex;
   flex-direction:column;
   align-items : center;
@@ -33,17 +56,18 @@ const Wrap = styled.div`
 
   h1 {
     text-align: center;
-    font-weight: 500;
-    font-size: 28px;
+    font-weight: 600;
+    font-size: 22px;
     color: #333;
+    margin-bottom: 30px;
   }
 
   input {
     outline: none;
     border: 1px solid #ccc;
     border-radius: 3px;
-    margin: 10px auto;
-    padding: 15px;
+    margin: 10px auto 0px auto;
+    padding: 20px;
     width: 340px;
 
     &:focus {
@@ -60,7 +84,7 @@ const Wrap = styled.div`
   button {
     width:370px;
     height:56px;
-    margin: 10px auto;
+    margin: 10px auto 0px auto;
     border: none;
     border-radius: 3px;
     font-size: 16px;
@@ -81,11 +105,32 @@ const Wrap = styled.div`
 `
 
 const LoginOptions = styled.div`
+  display:flex;
+  align-items: center;
+  margin: 10px auto 20px auto;
+  width: 370px;
+  font-size: 13px;
+  color: #333;
+
   input[type=checkbox]{
-    width: 10px;
-    height: 10px;
-    margin: 10px auto;
+    visibility: hidden;
+    width: 0px;
+    height: 0px;
   }
+`
+const CheckBox = styled.div`
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    margin: 2px 5px 0px 0px;
+    padding: 0px;
+    font-size: 15px;
+    color: #fff;
+    border: 1.5px solid ${(props) => props.is_checked ? '#5f0080' : '#bbb'};
+    border-radius: 3px;
+    background-color: ${(props) => props.is_checked ? '#5f0080' : '#fff'}
 `
 
 export default Login;

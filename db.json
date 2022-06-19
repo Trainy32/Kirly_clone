@@ -1,0 +1,49 @@
+{
+  "login-test": [
+    {
+      "id": 0,
+      "username": "test",
+      "password": "test"
+    }
+  ],
+  "signup-test": [
+    {
+      "id": 0,
+      "username": "test",
+      "password": "test"
+    },
+    {
+      "username": "",
+      "password": "",
+      "nickname": "",
+      "email": "",
+      "phone": "",
+      "address": "서울시 00구 00로00길 10",
+      "addressDetail": "00동 00호",
+      "zoneNo": 12345,
+      "id": 1
+    },
+    {
+      "username": "id",
+      "password": "pw",
+      "nickname": "수현",
+      "email": "kirly@mmm.ccc",
+      "phone": "0000000000",
+      "address": "서울시 00구 00로00길 10",
+      "addressDetail": "00동 00호",
+      "zoneNo": 12345,
+      "id": 2
+    },
+    {
+      "username": "id",
+      "password": "pw",
+      "nickname": "수현",
+      "email": "kirly@mmm.ccc",
+      "phone": "0000000000",
+      "address": "서울시 00구 00로00길 10",
+      "addressDetail": "00동 00호",
+      "zoneNo": 12345,
+      "id": 3
+    }
+  ]
+}
