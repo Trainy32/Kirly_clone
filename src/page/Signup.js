@@ -3,31 +3,52 @@ import { useNavigate } from 'react-router-dom'
 
 // 외부 데이터
 import axios from 'axios'
-import DaumPostcode from 'react-daum-postcode'
 
 // 컴포넌트
-import AlertModal from "../components/AlertModal";
+import Modal from "../components/Modal";
+import Alert from "../components/Alert";
+import FindAddress from "../components/FindAddress";
 
 // CSS 관련
 import styled from 'styled-components'
 import { IoSearch } from 'react-icons/io5';
 import { HiCheck } from 'react-icons/hi';
 
+
 const Signup = (props) => {
   const navigate = useNavigate()
 
   // 모달창 컨트롤
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalMsg, setModalMsg] = useState('이메일을 입력해주세요.')
+  const [modalType, setModalType] = useState(null)
+  const [modalMsg, setModalMsg] = useState('잘못된 요청입니다.')
+
+  // 주소받아오기 
+  const [address, setAddress] = useState(null)
+
+  console.log(address)
+
+  const getAddress = () => {
+    setModalType('address')
+    setModalOpen(true)
+  }
 
   // 중복검사
   const [idDupCheck, setIdDupCheck] = useState(false)
   const [emailDupCheck, setEmailDupCheck] = useState(false)
 
   const dupCheckAction = (type) => {
-    setModalOpen(true)
+ 
+    if(type === 'id') {
+      setModalType('alert')
+      setModalMsg('아이디를 입력해주세요')
+      setModalOpen(true)
+    } else if (type === 'email') {
+      setModalType('alert')
+      setModalMsg('이메일을 입력해주세요.')
+      setModalOpen(true)
+    }
   }
-
 
   // 회원정보 받아오기
   const id_ref = React.useRef(null)
@@ -36,7 +57,8 @@ const Signup = (props) => {
   const name_ref = React.useRef(null)
   const email_ref = React.useRef(null)
   const tel_ref = React.useRef(null)
-  const address_ref = React.useRef(null)
+  const subAddress_ref = React.useRef(null)
+
 
 
   // 회원가입
@@ -71,7 +93,7 @@ const Signup = (props) => {
         .then(response => console.log(response))
 
     } else {
-      window.alert('alertMsg')
+      window.alert(alertMsg)
     }
   }
 
@@ -112,7 +134,16 @@ const Signup = (props) => {
 
   return (
     <>
-      {modalOpen ? <AlertModal data={{ open: true, msg: modalMsg }} /> : null}
+
+
+      { modalOpen ? 
+      <Modal setModalOpen={setModalOpen} btn={false}>
+        {
+        modalType === 'alert' ? <Alert msg={modalMsg} />
+        : modalType === 'address' ? <FindAddress setAddress={setAddress} setModalOpen={setModalOpen}/>
+        : '잘못된 접근입니다'
+        }
+      </Modal> : null }
 
       <Wrap>
         <button onClick={() => navigate('/login')}> 임시: 로그인 가기</button>
@@ -171,17 +202,25 @@ const Signup = (props) => {
 
             <tr>
               <th><h4>주소</h4></th>
-              <td><button className="addressBtn"> <IoSearch /> 주소 검색 </button>
+              <td><button className="addressBtn" onClick={getAddress}> <IoSearch /> 주소 검색 </button>
+              <input type='text' value={address?.address}/>
+              <input type='text' />
                 <br /><sub>배송지에 따라 상품 정보가 달라질 수 있습니다.</sub></td>
+              { address ? <td><button className="checkBtn"> <IoSearch /> 재검색 </button></td> : null}
             </tr>
 
+            
+            <MidLine>
+              <td colSpan='3'/>
+            </MidLine>
 
-            <tr id='termsSection'>
+
+            <TermsSection>
               <th><h4>이용약관 동의<RedStar>*</RedStar></h4></th>
               <td colSpan='2'><AllTermsLabel> <CheckBox is_checked={allCheck}><HiCheck/></CheckBox>
                 <input type='checkbox' checked={allCheck} onChange={() => allCheckAction()} />전체 동의합니다. </AllTermsLabel>
                   <sub>선택항목에 동의하지 않은 경우도 회원가입 및 일반적인 서비스를 이용할 수 있습니다. </sub></td>
-            </tr>
+            </TermsSection>
 
             <tr>
               <td />
@@ -247,9 +286,7 @@ const Signup = (props) => {
 
 export default Signup;
 
-// #5f0080
-// #4c4c4c
-// #666
+// 보라색 #5f0080
 
 const Wrap = styled.div`
   width: 650px;
@@ -277,7 +314,6 @@ const InputFields = styled.table`
   border-top: 2px solid #333;
   border-bottom: 1px solid #eee;
 
-
   tr, th, td {
     vertical-align: top;
     border-bottom: 5px solid #fff0;
@@ -291,7 +327,7 @@ const InputFields = styled.table`
 
   h4 {
     font-weight: 500;
-    margin: 5px;
+    margin: 5px;  
   }
 
   input {
@@ -300,7 +336,7 @@ const InputFields = styled.table`
     border-radius: 3px;
     margin-bottom: 10px;
     padding: 15px;
-    width: 300px;
+    width: 315px;
 
     &:focus {
       border: 1px solid #666;
@@ -352,10 +388,18 @@ const InputFields = styled.table`
     color: #666;
   }
 `
-const termsSection = styled.tr`
+
+const MidLine = styled.tr`
+  td{
+    border-top: 10px solid #fff0;
+    border-bottom: 1.5px solid #333;
+  }
 `
-
-
+const TermsSection = styled.tr`
+  th, td {
+    border-top: 10px solid #fff0;
+  }
+`
 
 const RedStar = styled.span`
 color:red;
@@ -390,8 +434,14 @@ const TermsBtn = styled.span`
 const MktCheck = styled.div`
   margin-left: 20px;
 
+  div {
+    margin: 7px 0px 3px 5px;
+    display:flex;
+    gap : 80px;
+  }
+
   p {
-    margin-left: 20px;
+    margin-left: 40px;
     color:#5f0080; 
     text-align: left;
   }
@@ -400,7 +450,7 @@ const MktCheck = styled.div`
 const JoinBtn = styled.button`
   width:240px;
   height:56px;
-  margin: 30px 150px;
+  margin: 30px 200px;
   border: none;
   border-radius: 3px;
   background: #5f0080;

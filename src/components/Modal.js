@@ -1,29 +1,30 @@
 import React, { useEffect, useState } from "react";
 import styled from 'styled-components'
 import { VscAdd } from 'react-icons/vsc';
+import Portal from "../components/Portal";
 
-const AlertModal = (props) => {
-  console.log(props.data)
-  const { open, msg, title } = props.data;
-  const [ isOpen, setIsOpen ] = React.useState(open)
+const Modal = (props) => {
+  const setModalOpen = props.setModalOpen;
+  const backDrop_ref = React.useRef(null)
 
-  const BackDropClose = () => {
-
+  const backDropClose = (e) => {
+    if (e.target === backDrop_ref.current) {
+      setModalOpen(false)
+    } 
   }
+  console.log(props.children)
 
-  const modalClose = () => {
-
-  }
-
-  return isOpen ? (
-    <BackDrop>
-      <Wrap>
-        <ModalHead> 알림메시지 <span onClick={()=>setIsOpen(false)} ><VscAdd/></span> </ModalHead>
-        <Content> { msg } </Content>
-        <ConfirmBtn onClick={()=>setIsOpen(false)}> 확인 </ConfirmBtn>
-      </Wrap>
-    </BackDrop>
-  ) : null
+  return (
+    <Portal>
+      <BackDrop ref={backDrop_ref} onClick={(e) => backDropClose(e)}>
+        <Wrap>
+          <CloseBtn onClick={()=>setModalOpen(false)} ><VscAdd/></CloseBtn> 
+            { props.children }
+            { props.btn ? <ConfirmBtn onClick={()=>setModalOpen(false)}> 확인 </ConfirmBtn> : null }
+        </Wrap>
+      </BackDrop>
+    </Portal>
+  )
 }
 
 const BackDrop = styled.div`
@@ -38,6 +39,7 @@ const BackDrop = styled.div`
   z-index: 999;
 `
 const Wrap = styled.div`
+  position: relative;
   width: 420px;
   padding: 25px;
   background: #fff;
@@ -48,8 +50,6 @@ const Wrap = styled.div`
   justify-content: center;
 `
 const ModalHead = styled.div`
-  display:flex;
-  justify-content: space-between;
   margin-bottom: 10px;
 
   color: #5f0080;
@@ -57,7 +57,9 @@ const ModalHead = styled.div`
   font-size: 14px;
 
   span {
-    margin: -10px 0px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
     font-size: 30px;
     font-weight: 100;
     color: #aaa;
@@ -65,6 +67,17 @@ const ModalHead = styled.div`
     cursor:pointer;
   }
 `
+const CloseBtn = styled.span`
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 30px;
+    font-weight: 100;
+    color: #aaa;
+    transform: rotate(45deg);
+    cursor:pointer;
+`
+
 const ConfirmBtn = styled.button`
   margin: 20px auto 10px auto;
   width:160px;
@@ -87,4 +100,4 @@ const Content = styled.div`
   font-size: 14px;
 `
 
-export default AlertModal
+export default Modal
