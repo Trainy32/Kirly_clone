@@ -12,7 +12,6 @@ const Modal = (props) => {
       setModalOpen(false)
     } 
   }
-  console.log(props.children)
 
   return (
     <Portal>
@@ -49,24 +48,7 @@ const Wrap = styled.div`
   flex-direction: column;
   justify-content: center;
 `
-const ModalHead = styled.div`
-  margin-bottom: 10px;
 
-  color: #5f0080;
-  font-weight: 500;
-  font-size: 14px;
-
-  span {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    font-size: 30px;
-    font-weight: 100;
-    color: #aaa;
-    transform: rotate(45deg);
-    cursor:pointer;
-  }
-`
 const CloseBtn = styled.span`
     position: absolute;
     right: 20px;
@@ -88,16 +70,6 @@ const ConfirmBtn = styled.button`
   font-weight: 500;
   color: #fff;
   cursor:pointer;
-`
-
-const Content = styled.div`
-  border-top: 1px solid #aaa;
-  width: 100%;
-  padding: 40px 0px 30px; 
-  text-align: center;
-  color: #666;
-  font-weight: 400;
-  font-size: 14px;
 `
 
 export default Modal

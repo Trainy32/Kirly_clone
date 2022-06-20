@@ -11,15 +11,18 @@ import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 const FindAddress = (props) => {
   const navigate = useNavigate()
-  const setAddress = props.setAddress
+  const setAddress = props.setAddress;
   const setModalOpen = props.setModalOpen;
 
   const [zoneCode, setZoneCode] = React.useState(null)  
   const [mainAddress, setMainAddress] = React.useState(null)
   const detailAdr_ref = React.useRef(null)
 
+  console.log(props)
+
   // 기본 주소 받아오는 함수. 도로명, 건물명, 우편번호
   const handleComplete = (data) => {
+    console.log(data)
     let fullAddress = data.address;
     let extraAddress = '';
 
@@ -34,8 +37,8 @@ const FindAddress = (props) => {
     }
 
     setMainAddress(fullAddress);
-    setZoneCode(data.zonecode)
-    setModalOpen(false)
+    setZoneCode(data.zonecode);
+
   };
 
   const InsertAddress = () => {
@@ -44,10 +47,8 @@ const FindAddress = (props) => {
       addressDetail:detailAdr_ref.current.value,
       zoneCode:zoneCode
     }
-
     setAddress(addressData)
     setModalOpen(false)
-
   }
 
   return (

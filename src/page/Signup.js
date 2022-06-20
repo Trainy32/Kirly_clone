@@ -24,9 +24,7 @@ const Signup = (props) => {
   const [modalMsg, setModalMsg] = useState('잘못된 요청입니다.')
 
   // 주소받아오기 
-  const [address, setAddress] = useState(null)
-
-  console.log(address)
+  const [address, setAddress] = React.useState(null)
 
   const getAddress = () => {
     setModalType('address')
@@ -38,8 +36,7 @@ const Signup = (props) => {
   const [emailDupCheck, setEmailDupCheck] = useState(false)
 
   const dupCheckAction = (type) => {
- 
-    if(type === 'id') {
+    if (type === 'id') {
       setModalType('alert')
       setModalMsg('아이디를 입력해주세요')
       setModalOpen(true)
@@ -69,24 +66,24 @@ const Signup = (props) => {
         : !idDupCheck ? '아이디 중복 확인을 해주세요'
           : pw_ref.current.value === '' ? '비밀번호를 입력해주세요'
             : pwCheck_ref.current.value === '' ? '비밀번호를 한번 더 입력해주세요'
-              : pw_ref.current.value === pwCheck_ref.current.value ? '비밀번호 확인이 일치하지 않아요'
+              : pw_ref.current.value !== pwCheck_ref.current.value ? '비밀번호 확인이 일치하지 않아요'
                 : name_ref.current.value === '' ? '이름을 입력해주세요'
                   : email_ref.current.value === '' ? '이메일 형식을 확인해주세요'
                     : !emailDupCheck ? '이메일 중복 확인을 해주세요'
-                      : requiredCheck ? '필수 동의 항목에 체크해주세요'
-                        : ''
+                      : tel_ref.current.value === '' ? '휴대폰 번호를 입력해주세요'
+                        : requiredCheck ? '필수 동의 항목에 체크해주세요'
+                          : 'pass'
 
-
-    if (requiredCheck) {
+    if (alertMsg === 'pass') {
       const userData = {
         username: id_ref.current.value,
         password: pwCheck_ref.current.value,
         nickname: name_ref.current.value,
         email: email_ref.current.value,
         phone: tel_ref.current.value,
-        address: '서울시 00구 00로00길 10',
-        addressDetail: '00동 00호',
-        zoneNo: 12345
+        address: address.address,
+        addressDetail: subAddress_ref.current.value,
+        zonecode: address.zoneCode
       }
 
       axios.post('http://localhost:5001/signup-test', userData)
@@ -94,6 +91,15 @@ const Signup = (props) => {
 
     } else {
       window.alert(alertMsg)
+
+      const inputAtIssue =
+        id_ref.current.value === '' || !idDupCheck ? id_ref
+          : pw_ref.current.value === '' ? pw_ref
+            : pw_ref.current.value !== pwCheck_ref.current.value ? pwCheck_ref
+              : name_ref.current.value === '' ? name_ref
+                : !emailDupCheck ? email_ref : tel_ref
+
+      inputAtIssue.current.focus()
     }
   }
 
@@ -134,16 +140,14 @@ const Signup = (props) => {
 
   return (
     <>
-
-
-      { modalOpen ? 
-      <Modal setModalOpen={setModalOpen} btn={false}>
-        {
-        modalType === 'alert' ? <Alert msg={modalMsg} />
-        : modalType === 'address' ? <FindAddress setAddress={setAddress} setModalOpen={setModalOpen}/>
-        : '잘못된 접근입니다'
-        }
-      </Modal> : null }
+      {modalOpen ?
+        <Modal setModalOpen={setModalOpen} btn={modalType === 'address' ? false : true}>
+          {
+            modalType === 'alert' ? <Alert msg={modalMsg} />
+              : modalType === 'address' ? <FindAddress setAddress={setAddress} setModalOpen={setModalOpen} />
+                : '잘못된 접근입니다'
+          }
+        </Modal> : null}
 
       <Wrap>
         <button onClick={() => navigate('/login')}> 임시: 로그인 가기</button>
@@ -202,64 +206,67 @@ const Signup = (props) => {
 
             <tr>
               <th><h4>주소</h4></th>
-              <td><button className="addressBtn" onClick={getAddress}> <IoSearch /> 주소 검색 </button>
-              <input type='text' value={address?.address}/>
-              <input type='text' />
+              <td>
+                {address ?
+                  <><input type='text' value={address?.address} readOnly />
+                    <input type='text' defaultValue={address?.addressDetail} ref={subAddress_ref} placeholder="나머지 주소를 입력해주세요" /></>
+                  : <button className="addressBtn" onClick={getAddress}> <IoSearch /> 주소 검색 </button>
+                }
                 <br /><sub>배송지에 따라 상품 정보가 달라질 수 있습니다.</sub></td>
-              { address ? <td><button className="checkBtn"> <IoSearch /> 재검색 </button></td> : null}
+
+              {address ? <td><button className="checkBtn" onClick={getAddress}> <IoSearch /> 재검색 </button></td> : null}
             </tr>
 
-            
             <MidLine>
-              <td colSpan='3'/>
+              <td colSpan='3' />
             </MidLine>
 
 
             <TermsSection>
               <th><h4>이용약관 동의<RedStar>*</RedStar></h4></th>
-              <td colSpan='2'><AllTermsLabel> <CheckBox is_checked={allCheck}><HiCheck/></CheckBox>
+              <td colSpan='2'><AllTermsLabel> <CheckBox is_checked={allCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={allCheck} onChange={() => allCheckAction()} />전체 동의합니다. </AllTermsLabel>
-                  <sub>선택항목에 동의하지 않은 경우도 회원가입 및 일반적인 서비스를 이용할 수 있습니다. </sub></td>
+                <sub>선택항목에 동의하지 않은 경우도 회원가입 및 일반적인 서비스를 이용할 수 있습니다. </sub></td>
             </TermsSection>
 
             <tr>
               <td />
-              <td ><TermsLabel> <CheckBox is_checked={useTermCheck}><HiCheck/></CheckBox>
+              <td ><TermsLabel> <CheckBox is_checked={useTermCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={useTermCheck} onChange={() => setUseTermCheck(!useTermCheck)} />
                 이용약관 동의 <span>(필수)</span> </TermsLabel>
               </td>
-              <td><TermsBtn>약관보기 ></TermsBtn></td>
+              <td><TermsBtn>약관보기 &gt;</TermsBtn></td>
             </tr>
 
             <tr>
               <td />
-              <td><TermsLabel> <CheckBox is_checked={privacyCheck}><HiCheck/></CheckBox>
+              <td><TermsLabel> <CheckBox is_checked={privacyCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={privacyCheck} onChange={() => setPrivacyCheck(!privacyCheck)} />
                 개인정보 수집·이용동의 <span>(필수)</span> </TermsLabel>
               </td>
-              <td><TermsBtn>약관보기 ></TermsBtn></td>
+              <td><TermsBtn>약관보기 &gt;</TermsBtn></td>
             </tr>
 
             <tr>
               <td />
-              <td><TermsLabel> <CheckBox is_checked={optPrivacyCheck}><HiCheck/></CheckBox>
+              <td><TermsLabel> <CheckBox is_checked={optPrivacyCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={optPrivacyCheck} onChange={() => setOptPrivacyCheck(!optPrivacyCheck)} />
                 개인정보 수집·이용동의<span>(선택)</span> </TermsLabel>
               </td>
-              <td><TermsBtn>약관보기 > </TermsBtn></td>
+              <td><TermsBtn>약관보기 &gt; </TermsBtn></td>
             </tr>
 
             <tr>
               <td />
               <td colSpan='2'>
-                <TermsLabel> <CheckBox is_checked={allMktCheck}><HiCheck/></CheckBox>
+                <TermsLabel> <CheckBox is_checked={allMktCheck}><HiCheck /></CheckBox>
                   <input type='checkbox' checked={allMktCheck} onChange={() => MktCheckAction()} />
                   무료배송,할인쿠폰 등 혜택/정보 수신동의<span>(선택)</span></TermsLabel>
                 <MktCheck>
                   <div>
-                    <TermsLabel> <CheckBox is_checked={smsMktCheck}><HiCheck/></CheckBox>
+                    <TermsLabel> <CheckBox is_checked={smsMktCheck}><HiCheck /></CheckBox>
                       <input type='checkbox' checked={smsMktCheck} onChange={() => setSmsMktCheck(!smsMktCheck)} />SMS</TermsLabel>
-                    <TermsLabel> <CheckBox is_checked={emailMktCheck}><HiCheck/></CheckBox>
+                    <TermsLabel> <CheckBox is_checked={emailMktCheck}><HiCheck /></CheckBox>
                       <input type='checkbox' checked={emailMktCheck} onChange={() => setEmailMktCheck(!emailMktCheck)} />이메일</TermsLabel>
                   </div>
                   <p> └ 동의 시 한 달간 [5%적립] + [2만원 이상 무료배송] 첫 주문 후 안내</p>
@@ -269,7 +276,7 @@ const Signup = (props) => {
 
             <tr>
               <td />
-              <td><TermsLabel><CheckBox is_checked={ageCheck}><HiCheck/></CheckBox>
+              <td><TermsLabel><CheckBox is_checked={ageCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={ageCheck} onChange={() => setAgeCheck(!ageCheck)} />
                 본인은 만 14세 이상입니다.<span>(필수)</span></TermsLabel>
               </td>

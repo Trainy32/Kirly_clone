@@ -44,6 +44,50 @@
       "addressDetail": "00동 00호",
       "zoneNo": 12345,
       "id": 3
+    },
+    {
+      "username": "ㄹㄹㄹ",
+      "password": "fff",
+      "nickname": "ff",
+      "email": "ff",
+      "phone": "ff",
+      "address": "경기 성남시 분당구 대왕판교로 477 (판교동, 낙생고등학교)",
+      "addressDetail": "00동 00호",
+      "zoneCode": "13480",
+      "id": 4
+    },
+    {
+      "username": "ㄹㄹㄹ",
+      "password": "fff",
+      "nickname": "ff",
+      "email": "ff",
+      "phone": "ff",
+      "address": "경기 성남시 분당구 대왕판교로 477 (판교동, 낙생고등학교)",
+      "addressDetail": "판교",
+      "zoneCode": "13480",
+      "id": 5
+    },
+    {
+      "username": "ㄹㄹㄹ",
+      "password": "fff",
+      "nickname": "ff",
+      "email": "ff",
+      "phone": "ff",
+      "address": "경기 성남시 분당구 대왕판교로 477 (판교동, 낙생고등학교)",
+      "addressDetail": "판교ssss",
+      "zoneCode": "13480",
+      "id": 6
+    },
+    {
+      "username": "ㄹㄹㄹ",
+      "password": "fff",
+      "nickname": "ff",
+      "email": "ff",
+      "phone": "ff",
+      "address": "경남 사천시 주공1길 7 (벌리동, 와룡반점)",
+      "addressDetail": "판교ssss",
+      "zoneCode": "52550",
+      "id": 7
     }
   ]
 }
