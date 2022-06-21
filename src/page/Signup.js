@@ -206,8 +206,6 @@ const Signup = (props) => {
         </Modal> : null}
 
       <Wrap>
-        <button onClick={() => navigate('/login')}> 임시: 로그인 가기</button>
-
         <h1>회원가입</h1>
         <p><RedStar>*</RedStar>필수 입력사항</p>
 

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 인스턴스 : 사례
 const instance = axios.create({
-  baseURL: "http://" 
+  baseURL: "http://13.125.50.85" 
 });
 
 let user_token = localStorage.getItem("user_token");
