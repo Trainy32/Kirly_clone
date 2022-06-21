@@ -7,7 +7,10 @@ import styled from 'styled-components'
 // 컴포넌트 Imports
 import Login from "./page/Login";
 import Signup from "./page/Signup";
-import Detail from "./page/Detail"
+import Detail from "./page/Detail";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Main from "./page/Main";
 
 
 function App() {
@@ -15,12 +18,15 @@ function App() {
   
   return (
     <div className="App">
+      <Header/>
       <Routes>
-        <Route path='/' element={<> <button onClick={()=> navigate('/detail')}>임시이동버튼</button></>} />
+
+        <Route path='/' element={<Main/>} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
         <Route path='/detail' element={<Detail />} />
       </Routes>
+      <Footer/>
     </div>
   );
 }
