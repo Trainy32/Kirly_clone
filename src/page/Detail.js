@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useParams } from 'react-router-dom'
 
 import axios from 'axios'
+import instance, { customAxios } from "../shared/Request";
 
 // CSS 관련
 import styled from 'styled-components'
@@ -26,10 +27,17 @@ const Detail = (props) => {
   const [heartTogle, setHeartTogle] = React.useState(null)
 
   //상품 데이터 불러오기
-  React.useEffect(() => {
-    axios.get('http://localhost:5001/goods-test?id=' + params.productId)
-    .then(response => setThisProduct(response.data[0]))
+  // React.useEffect(() => {
+  //   axios.get('http://localhost:5001/goods-test?id=' + params.productId)
+  //   .then(response => setThisProduct(response.data[0]))
+  // }, [])
+
+    React.useEffect(() => {
+    customAxios.get('/api/product/' + params.productId)
+    .then(response => setThisProduct(response.data))
   }, [])
+
+  console.log(thisProduct)
 
   // 구매수량 체크
   const [qty, setQty] = React.useState(1)
@@ -109,7 +117,7 @@ const Detail = (props) => {
             </Sum>
 
             <ButtonArea>
-              <HeartBtn heartTogle={heartTogle} onClick={()=> setHeartTogle(!heartTogle)}> { heartTogle ? <VscHeart /> : <IoMdHeart /> }</HeartBtn>
+              <HeartBtn heartTogle={heartTogle} onClick={()=> setHeartTogle(!heartTogle)}> { heartTogle ? <IoMdHeart /> : <VscHeart /> }</HeartBtn>
               <BellBtn><VscBell /></BellBtn>
               <SquareBtn filled={true} style={{ width: '76%' }} onClick={CartAction}>장바구니 담기</SquareBtn>
             </ButtonArea>
@@ -284,7 +292,7 @@ const HeartBtn = styled.button`
   border-radius: 3px;
   font-size : 27px;
   padding:0px;
-  color: ${(props) => props.heartTogle ? '#5f0081' : '#FF5A5A'};
+  color: ${(props) => props.heartTogle ? '#FF5A5A' : '#5f0081'};
   cursor:pointer;
 `
 

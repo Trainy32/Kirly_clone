@@ -45,7 +45,7 @@ const Signup = (props) => {
   // 아이디, 비밀번호 양식 체크
 
   const [idFormCheck, setIdFormCheck] = useState(null)
-  
+
   const checkId = (e) => {
     setIdDupCheck(false)
     setIdFormCheck(/^[a-zA-Z0-9]{6,}/g.test(e.target.value))
@@ -74,11 +74,46 @@ const Signup = (props) => {
   const [emailDupCheck, setEmailDupCheck] = useState(true)
 
   const dupCheckAction = (type) => {
-    setIdDupCheck(true)
-    setEmailDupCheck(true)
-  //   if(type === 'id') {
-  //   const requestUrl = 'http://localhost:5001/signup-test'
-  //   const currentValue = id_ref.current.value
+    if (type === 'id') {
+      // const requestUrl = 'http://localhost:5001/signup-test'
+      // const currentValue = id_ref.current.value
+
+      const requestUrl = '/api/user/signup/checkId/' + id_ref.current.value
+
+      customAxios.get(requestUrl)
+        .then(response => {
+          console.log(response)
+          setIdDupCheck(response)
+          window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
+
+          if (response === false) {
+            setModalType('alert')
+            setModalMsg('아이디를 입력해주세요.')
+            setModalOpen(true)
+          }
+        })
+
+    } else {
+
+      const requestUrl = '/api/user/signup/checkEmail/' + email_ref.current.value
+
+      customAxios.get(requestUrl)
+        .then(response => {
+          console.log(response)
+          setEmailDupCheck(response)
+          window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
+
+          if (response === false) {
+            setModalType('alert')
+            setModalMsg('이메일을 확인해주세요')
+            setModalOpen(true)
+          }
+        })
+        
+      
+    }
+  }
+
 
   //     if (idFormCheck) {
   //       axios.get(requestUrl)
@@ -100,7 +135,7 @@ const Signup = (props) => {
   //   const emailFormCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(currentValue)
 
   //     if (emailFormCheck) {
-  //       axios.get(emailFormCheck)
+  //       axios.get(requestUrl)
   //         .then(response => response.data.find((v) => v.email === currentValue))
   //         .then(response => {
   //           setIdDupCheck(!response)
@@ -112,7 +147,7 @@ const Signup = (props) => {
   //       setModalOpen(true)
   //     }
   //  }
-  }
+  // }
 
 
   // 회원가입
@@ -129,9 +164,9 @@ const Signup = (props) => {
                     : !emailDupCheck ? '이메일 중복을 확인 해주세요'
                       : tel_ref.current.value === '' ? '휴대폰 번호를 입력해주세요'
                         // : requiredCheck ? '필수 동의 항목에 체크해주세요'
-                          : 'pass'
+                        : 'pass'
 
-                          
+
     if (alertMsg === 'pass') {
       const userData = {
         username: id_ref.current.value,
@@ -147,8 +182,8 @@ const Signup = (props) => {
       // axios.post('http://localhost:5001/signup-test', userData)
       //   .then(response => console.log(response))
 
-      customAxios.post('/api/user/signup',userData)
-      .then(response => console.log(response))
+      customAxios.post('/api/user/signup', userData)
+        .then(response => console.log(response))
 
     } else {
       window.alert(alertMsg)
@@ -253,8 +288,8 @@ const Signup = (props) => {
 
             <tr>
               <th><h4>비밀번호 확인<RedStar>*</RedStar></h4></th>
-              <td><input ref={pwConfirm_ref} onChange={(e)=> setPwConfirmCheck(pwConfirm_ref.current?.value === pw_ref.current?.value && pwConfirm_ref.current?.value !== '')}
-                  type='password' placeholder="비밀번호를 한번 더 입력해주세요" />
+              <td><input ref={pwConfirm_ref} onChange={(e) => setPwConfirmCheck(pwConfirm_ref.current?.value === pw_ref.current?.value && pwConfirm_ref.current?.value !== '')}
+                type='password' placeholder="비밀번호를 한번 더 입력해주세요" />
 
                 <ValidityList>
                   <ValidityInfo is_valid={PwConfirmCheck}>
