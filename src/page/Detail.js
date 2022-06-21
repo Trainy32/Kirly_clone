@@ -26,15 +26,9 @@ const Detail = (props) => {
   const [thisProduct, setThisProduct] = React.useState(null)
   const [heartTogle, setHeartTogle] = React.useState(null)
 
-  //상품 데이터 불러오기
-  // React.useEffect(() => {
-  //   axios.get('http://localhost:5001/goods-test?id=' + params.productId)
-  //   .then(response => setThisProduct(response.data[0]))
-  // }, [])
-
-    React.useEffect(() => {
-    customAxios.get('/api/product/' + params.productId)
-    .then(response => setThisProduct(response.data))
+  React.useEffect(() => {
+  customAxios.get('/api/product/' + params.productId)
+  .then(response => setThisProduct(response.data))
   }, [])
 
   console.log(thisProduct)

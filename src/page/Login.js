@@ -16,7 +16,7 @@ const Login = (props) => {
   const [secureLogin, setSecureLogin] = useState(true)
 
   const loginAction =  (e) => {
-    e.preventDefault()
+    // e.preventDefault()
 
     if (id_ref.current.value === '' || pw_ref.current.value === '') {
       window.alert('아이디 혹은 패스워드를 정확히 입력해주세요')
@@ -25,13 +25,12 @@ const Login = (props) => {
         username : id_ref.current.value,
         password : pw_ref.current.value 
       }
-  
-      // 로컬환경
-      // axios.post('http://localhost:5001/login-test', loginData)
-      // .then(response => console.log(response))
 
       customAxios.post('/api/user/login', loginData)
-      .then(response => console.log(response))
+      .then(response => {
+        console.log(response)
+      })
+
     }
   }
 

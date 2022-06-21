@@ -43,7 +43,6 @@ const Signup = (props) => {
   const subAddress_ref = React.useRef(null)
 
   // 아이디, 비밀번호 양식 체크
-
   const [idFormCheck, setIdFormCheck] = useState(null)
 
   const checkId = (e) => {
@@ -69,85 +68,34 @@ const Signup = (props) => {
 
   const [PwConfirmCheck, setPwConfirmCheck] = useState(null)
 
-  // 중복검사
-  const [idDupCheck, setIdDupCheck] = useState(true)
-  const [emailDupCheck, setEmailDupCheck] = useState(true)
-
-  const dupCheckAction = (type) => {
-    if (type === 'id') {
-      // const requestUrl = 'http://localhost:5001/signup-test'
-      // const currentValue = id_ref.current.value
-
-      const requestUrl = '/api/user/signup/checkId/' + id_ref.current.value
-
-      customAxios.get(requestUrl)
-        .then(response => {
-          console.log(response)
-          setIdDupCheck(response)
-          window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
-
-          if (response === false) {
-            setModalType('alert')
-            setModalMsg('아이디를 입력해주세요.')
-            setModalOpen(true)
-          }
-        })
-
-    } else {
-
-      const requestUrl = '/api/user/signup/checkEmail/' + email_ref.current.value
-
-      customAxios.get(requestUrl)
-        .then(response => {
-          console.log(response)
-          setEmailDupCheck(response)
-          window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
-
-          if (response === false) {
-            setModalType('alert')
-            setModalMsg('이메일을 확인해주세요')
-            setModalOpen(true)
-          }
-        })
-        
-      
-    }
+  // 전화번호 문자 삭제
+  const DeleteAlphabet = () => {
+    tel_ref.current.value =  tel_ref.current.value.toString().replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
   }
 
+  // 중복검사
+  const [idDupCheck, setIdDupCheck] = useState(false)
+  const [emailDupCheck, setEmailDupCheck] = useState(false)
 
-  //     if (idFormCheck) {
-  //       axios.get(requestUrl)
-  //         .then(response => response.data.find((v) => v.username === currentValue))
-  //         .then(response => {
-  //           setIdDupCheck(!response)
-  //           window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
-  //         })
-  //     } else {
-  //       setModalType('alert')
-  //       setModalMsg('아이디를 입력해주세요.')
-  //       setModalOpen(true)
-  //     }
-  //   }
+  const dupCheckAction = (type) => {
+    const RequestUrl = type === 'id' ? ('/api/user/signup/checkId/' + id_ref.current.value) : ('/api/user/signup/checkEmail/' + email_ref.current.value)
+    const typeKOR = type === 'id' ? '아이디' : '이메일'
+    const emailFormCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(email_ref.current.value)
 
-  //  if(type === 'email') {
-  //   const requestUrl = 'http://localhost:5001/signup-test'
-  //   const currentValue = email_ref.current.value
-  //   const emailFormCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(currentValue)
-
-  //     if (emailFormCheck) {
-  //       axios.get(requestUrl)
-  //         .then(response => response.data.find((v) => v.email === currentValue))
-  //         .then(response => {
-  //           setIdDupCheck(!response)
-  //           window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
-  //         })
-  //     } else {
-  //       setModalType('alert')
-  //       setModalMsg('이메일 양식을 확인해주세요.')
-  //       setModalOpen(true)
-  //     }
-  //  }
-  // }
+    if ((type === 'id' && !idFormCheck) || (type === 'email' && !emailFormCheck)) {
+      setModalMsg(`${typeKOR} 양식을 확인해주세요`)
+      setModalType('alert')
+      setModalOpen(true)
+    } else {
+      customAxios.get(RequestUrl)
+        .then(response => {
+          setIdDupCheck(response.data)
+          setEmailDupCheck(response.data)
+          // console.log(response.data)
+          window.alert(response.data ? '사용이 가능합니다.' :  `이미 등록된 ${typeKOR}입니다.`)
+        })
+    }
+  }
 
 
   // 회원가입
@@ -163,8 +111,9 @@ const Signup = (props) => {
                   : email_ref.current.value === '' ? '이메일 형식을 확인해주세요'
                     : !emailDupCheck ? '이메일 중복을 확인 해주세요'
                       : tel_ref.current.value === '' ? '휴대폰 번호를 입력해주세요'
-                        // : requiredCheck ? '필수 동의 항목에 체크해주세요'
-                        : 'pass'
+                        : !address ? '주소를 입력해주세요'
+                          : !requiredCheck ? '필수 동의 항목에 체크해주세요'
+                            : 'pass'
 
 
     if (alertMsg === 'pass') {
@@ -173,17 +122,18 @@ const Signup = (props) => {
         password: pwConfirm_ref.current.value,
         nickname: name_ref.current.value,
         email: email_ref.current.value,
-        phone: tel_ref.current.value,
+        phone: parseInt(tel_ref.current.value),
         address: address.address,
         addressDetail: subAddress_ref.current.value,
         zonecode: address.zoneCode
       }
 
-      // axios.post('http://localhost:5001/signup-test', userData)
-      //   .then(response => console.log(response))
-
       customAxios.post('/api/user/signup', userData)
         .then(response => console.log(response))
+        .catch((err) => {
+          window.alert('에러가 발생했어요!')
+          console.log(err)
+        }) 
 
     } else {
       window.alert(alertMsg)
@@ -311,7 +261,7 @@ const Signup = (props) => {
 
             <tr>
               <th><h4>휴대폰<RedStar>*</RedStar></h4></th>
-              <td><input ref={tel_ref} type='tel' placeholder="숫자만 입력해주세요" /></td>
+              <td><input ref={tel_ref} type='tel' maxLength='11' onChange={DeleteAlphabet} placeholder="숫자만 입력해주세요" /></td>
             </tr>
 
             <tr>
