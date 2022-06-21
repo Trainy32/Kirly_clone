@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 // 외부 데이터
 import axios from 'axios'
+import instance, { customAxios } from "../shared/Request";
 
 // 컴포넌트
 import Modal from "../components/Modal";
@@ -69,48 +70,48 @@ const Signup = (props) => {
   const [PwConfirmCheck, setPwConfirmCheck] = useState(null)
 
   // 중복검사
-  const [idDupCheck, setIdDupCheck] = useState(false)
-  const [emailDupCheck, setEmailDupCheck] = useState(false)
+  const [idDupCheck, setIdDupCheck] = useState(true)
+  const [emailDupCheck, setEmailDupCheck] = useState(true)
 
   const dupCheckAction = (type) => {
+    setIdDupCheck(true)
+    setEmailDupCheck(true)
+  //   if(type === 'id') {
+  //   const requestUrl = 'http://localhost:5001/signup-test'
+  //   const currentValue = id_ref.current.value
 
-    if(type === 'id') {
-    const requestUrl = 'http://localhost:5001/signup-test'
-    const currentValue = id_ref.current.value
+  //     if (idFormCheck) {
+  //       axios.get(requestUrl)
+  //         .then(response => response.data.find((v) => v.username === currentValue))
+  //         .then(response => {
+  //           setIdDupCheck(!response)
+  //           window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
+  //         })
+  //     } else {
+  //       setModalType('alert')
+  //       setModalMsg('아이디를 입력해주세요.')
+  //       setModalOpen(true)
+  //     }
+  //   }
 
-      if (idFormCheck) {
-        axios.get(requestUrl)
-          .then(response => response.data.find((v) => v.username === currentValue))
-          .then(response => {
-            setIdDupCheck(!response)
-            window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
-          })
-      } else {
-        setModalType('alert')
-        setModalMsg('아이디를 입력해주세요.')
-        setModalOpen(true)
-      }
-    }
+  //  if(type === 'email') {
+  //   const requestUrl = 'http://localhost:5001/signup-test'
+  //   const currentValue = email_ref.current.value
+  //   const emailFormCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(currentValue)
 
-   if(type === 'email') {
-    const requestUrl = 'http://localhost:5001/signup-test'
-    const currentValue = email_ref.current.value
-    const emailFormCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(currentValue)
-
-      if (emailFormCheck) {
-        axios.get(emailFormCheck)
-          .then(response => response.data.find((v) => v.email === currentValue))
-          .then(response => {
-            setIdDupCheck(!response)
-            window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
-          })
-      } else {
-        setModalType('alert')
-        setModalMsg('이메일 양식을 확인해주세요.')
-        setModalOpen(true)
-      }
-   }
-
+  //     if (emailFormCheck) {
+  //       axios.get(emailFormCheck)
+  //         .then(response => response.data.find((v) => v.email === currentValue))
+  //         .then(response => {
+  //           setIdDupCheck(!response)
+  //           window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
+  //         })
+  //     } else {
+  //       setModalType('alert')
+  //       setModalMsg('이메일 양식을 확인해주세요.')
+  //       setModalOpen(true)
+  //     }
+  //  }
   }
 
 
@@ -127,7 +128,7 @@ const Signup = (props) => {
                   : email_ref.current.value === '' ? '이메일 형식을 확인해주세요'
                     : !emailDupCheck ? '이메일 중복을 확인 해주세요'
                       : tel_ref.current.value === '' ? '휴대폰 번호를 입력해주세요'
-                        : requiredCheck ? '필수 동의 항목에 체크해주세요'
+                        // : requiredCheck ? '필수 동의 항목에 체크해주세요'
                           : 'pass'
 
                           
@@ -143,8 +144,11 @@ const Signup = (props) => {
         zonecode: address.zoneCode
       }
 
-      axios.post('http://localhost:5001/signup-test', userData)
-        .then(response => console.log(response))
+      // axios.post('http://localhost:5001/signup-test', userData)
+      //   .then(response => console.log(response))
+
+      customAxios.post('/api/user/signup',userData)
+      .then(response => console.log(response))
 
     } else {
       window.alert(alertMsg)

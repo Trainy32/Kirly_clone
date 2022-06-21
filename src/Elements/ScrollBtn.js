@@ -17,14 +17,14 @@ const Btn = styled.button`
   position: fixed;
   z-index: 100;
   bottom: 30px;
-  right: 30px;
+  right: 35px;
   display:flex;
   justify-content:center;
   align-items:center;
   width: 55px;
   height: 55px;
   background-color: #fff;
-  border: 1px solid #ccc;
+  border: 1.5px solid #eee;
   border-radius: 120px;
   font-size : 28px;
   padding:0px;

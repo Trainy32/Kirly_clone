@@ -1,11 +1,14 @@
 import React from "react";
 import { useNavigate, useParams } from 'react-router-dom'
 
+import axios from 'axios'
+
 // CSS 관련
 import styled from 'styled-components'
 import { BiShareAlt } from 'react-icons/bi'
 import { VscHeart, VscBell } from 'react-icons/vsc'
 import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io'
+import { BsChevronDown, BsChevronUp } from 'react-icons/bs'
 
 // 컴포넌트
 import RoundBtn from "../Elements/RoundBtn";
@@ -13,100 +16,153 @@ import QtyBtn from "../Elements/QtyBtn";
 import SquareBtn from "../Elements/SquareBtn";
 import PointsTag from "../Elements/PointsTag";
 import ScrollBtn from "../Elements/ScrollBtn";
+import AddToCart from "../components/AddToCart";
 
 const Detail = (props) => {
+  const params = useParams()
+  const isLogin = props.isLogin
+
+  const [thisProduct, setThisProduct] = React.useState(null)
+  const [heartTogle, setHeartTogle] = React.useState(null)
+
+  //상품 데이터 불러오기
+  React.useEffect(() => {
+    axios.get('http://localhost:5001/goods-test?id=' + params.productId)
+    .then(response => setThisProduct(response.data[0]))
+  }, [])
+
+  // 구매수량 체크
   const [qty, setQty] = React.useState(1)
 
+  //장바구니
+  const [cartFooterOpen, setCartFooterOpen] = React.useState(false)
 
+  const CartAction = () => {
+    const newCartItem = {
+    name:thisProduct?.name,
+    thumb: thisProduct?.thumb,
+    price: thisProduct?.price,
+    qty: qty
+  }
+    AddToCart(newCartItem)
+  }
 
+  // 스크롤 메뉴를 위한 ref 
   const productDesc_ref = React.useRef(null)
   const productDetail_ref = React.useRef(null)
 
-
   return (
-    <Wrap>
-      <ScrollBtn />      
-      <RoundBtn size='small' onClick={() => console.log('ok')} style={{ position: 'absolute', top: '10px', right: '10px' }}><BiShareAlt /> </RoundBtn>
-      <TitleArea>
-        <Thumb img_url={'https://img-cf.kurly.com/shop/data/goods/1653965528732y0.jpg'}/>
-        <TitleTexts>
-          <h1>[바버] 1833 체다 치즈</h1>
-          <h5>가격, 퀄리티 모두 만족스러운 1A등급 우유</h5>
+    <>
+      <Wrap>
+        <ScrollBtn />
+        <RoundBtn size='small' onClick={() => console.log('ok')} style={{ position: 'absolute', top: '10px', right: '10px' }}><BiShareAlt /> </RoundBtn>
+        <TitleArea>
+          <Thumb img_url={thisProduct?.introImage} />
+          <TitleTexts>
+            <h1>{thisProduct?.name}</h1>
+            <h5>{thisProduct?.summary}</h5>
 
-          <PriceInfo>
-            <p><span className="num">{(1970).toLocaleString()}</span>원</p>
-            <PointsInfo>적립 제외 상품입니다.</PointsInfo>
-          </PriceInfo>
+            <PriceInfo>
+              <p><span className="num">{ thisProduct?.price ? (thisProduct?.price).toLocaleString() : '잠시 기다려주세요'}</span>원</p>
+              <PointsInfo> {isLogin ? '적립 제외 상품입니다.' : '로그인 후, 회원할인가와 적립혜택이 제공됩니다.'}</PointsInfo>
+            </PriceInfo>
 
-          <GoodsInfo>
-            <dt>판매단위</dt>
-            <dd>1통</dd>
-          </GoodsInfo>
+            <GoodsInfo>
+              <dt>판매단위</dt>
+              <dd>{thisProduct?.amount}</dd>
+            </GoodsInfo>
 
-          <GoodsInfo>
-            <dt>중량/용량</dt>
-            <dd>200g</dd>
-          </GoodsInfo>
+            <GoodsInfo>
+              <dt>중량/용량</dt>
+              <dd>{thisProduct?.weight}</dd>
+            </GoodsInfo>
 
-          <GoodsInfo>
-            <dt>원산지</dt>
-            <dd>국내산</dd>
-          </GoodsInfo>
+            <GoodsInfo>
+              <dt>원산지</dt>
+              <dd>{thisProduct?.origin}</dd>
+            </GoodsInfo>
 
-          <GoodsInfo>
-            <dt>포장타입</dt>
-            <dd>냉장</dd>
-          </GoodsInfo>
+            <GoodsInfo>
+              <dt>포장타입</dt>
+              <dd>{thisProduct?.packageType}</dd>
+            </GoodsInfo>
 
-          <GoodsInfo>
-            <dt>유통기한</dt>
-            <dd> 가급적 빨리 섭취를 권장합니다. </dd>
-          </GoodsInfo>
+            <GoodsInfo>
+              <dt>유통기한</dt>
+              <dd> {thisProduct?.expired > 0 ? thisProduct.expired+'일 남았습니다.' : '가급적 빨리 섭취를 권장합니다.'}  </dd>
+            </GoodsInfo>
 
-          <GoodsInfo>
-            <dt>안내사항</dt>
-            <dd>-신선식품의 특성상 상품의 중량에 3% 차이가 발생할 수 있습니다. 길게길게</dd>
-          </GoodsInfo>
+            <GoodsInfo>
+              <dt>안내사항</dt>
+              <dd> {thisProduct?.notice}</dd>
+            </GoodsInfo>
 
-          <GoodsInfo>
-            <dt>구매수량</dt>
-            <dd><QtyBtn qty={qty} setQty={setQty} /></dd>
-          </GoodsInfo>
+            <GoodsInfo>
+              <dt>구매수량</dt>
+              <dd><QtyBtn qty={qty} setQty={setQty} /></dd>
+            </GoodsInfo>
+
+            <Sum>
+              <TotalPrice>총 상품 금액 : <span className="num">{thisProduct?.price ? (thisProduct.price * qty).toLocaleString()  : '기다려주세요'}</span> 
+              <span className="won">원</span> </TotalPrice>
+              <PointsTag>0</PointsTag>
+            </Sum>
+
+            <ButtonArea>
+              <HeartBtn heartTogle={heartTogle} onClick={()=> setHeartTogle(!heartTogle)}> { heartTogle ? <VscHeart /> : <IoMdHeart /> }</HeartBtn>
+              <BellBtn><VscBell /></BellBtn>
+              <SquareBtn filled={true} style={{ width: '76%' }} onClick={CartAction}>장바구니 담기</SquareBtn>
+            </ButtonArea>
+
+
+          </TitleTexts>
+        </TitleArea>
+
+        <StickyHeader>
+          <div onClick={() => productDesc_ref.current.scrollIntoView({ behavior: 'smooth' })}>상품설명</div>
+          <div onClick={() => productDetail_ref.current.scrollIntoView({ behavior: 'smooth' })}>상세정보</div>
+          <div onClick={() => window.alert('지금은 이용할 수 없어요!')}>후기</div>
+          <div onClick={() => window.alert('지금은 이용할 수 없어요!')}>문의</div>
+        </StickyHeader>
+
+        <ProductDetail>
+          <MainImage ref={productDesc_ref} img_url={thisProduct?.viewImage} />
+          <div>
+            <h3>{thisProduct?.summary}</h3>
+            <h2>{thisProduct?.name}</h2>
+          </div>
+          <hr />
+          <p ref={productDetail_ref}>{thisProduct?.introDesc}</p>
+          {/* <AdditionalInfo src={process.env.PUBLIC_URL+'img/additionalInfo.jpg'} /> */}
+          <AdditionalInfo src={'https://firebasestorage.googleapis.com/v0/b/mymagazinepjt.appspot.com/o/postImg%2F1655809001396?alt=media&token=484da4e3-f477-4bd8-96a5-ef769b0f1271'} />
+        </ProductDetail>
+
+      </Wrap>
+
+      <CartFooter cartFooterOpen={cartFooterOpen} >
+        <div id="footerContent">
+        <SquareBtn filled={true} small={true} style={{ width: '170px', marginTop:'-48px'}} onClick={() => setCartFooterOpen(!cartFooterOpen)}> 
+          상품 선택 <Arrow>{ cartFooterOpen ? <BsChevronDown/> : <BsChevronUp/>}</Arrow>
+        </SquareBtn>
+
+        <CartItem>
+          <h5>{thisProduct?.name}</h5>
+          <QtyBtn qty={qty} setQty={setQty} />
+          <p><span className="num">{thisProduct?.price ? (thisProduct?.price).toLocaleString() : '기다려주세요'}</span>원</p>
+        </CartItem>
 
           <Sum>
-            <TotalPrice>총 상품 금액 : <span className="num">{(1970 * qty).toLocaleString()}</span> <span className="won">원</span> </TotalPrice>
+            <TotalPrice>총 상품 금액 : <span className="cart_num">{thisProduct?.price ? (thisProduct.price * qty).toLocaleString()  : '기다려주세요'}</span> <span className="won">원</span> </TotalPrice>
             <PointsTag>0</PointsTag>
           </Sum>
-
           <ButtonArea>
             <HeartBtn><VscHeart /></HeartBtn>
             <BellBtn><VscBell /></BellBtn>
-            <SquareBtn filled={true} style={{ width: '76%' }}>장바구니 담기</SquareBtn>
+            <SquareBtn filled={true} style={{ width: '300px' }} onClick={CartAction}>장바구니 담기</SquareBtn>
           </ButtonArea>
-
-
-        </TitleTexts>
-      </TitleArea>
-
-      <StickyHeader>
-        <div onClick={() => productDesc_ref.current.scrollIntoView({ behavior:'smooth' })}>상품설명</div>
-        <div onClick={() => productDetail_ref.current.scrollIntoView({ behavior:'smooth' })}>상세정보</div>
-        <div onClick={() => window.alert('지금은 이용할 수 없어요!')}>후기</div>
-        <div onClick={() => window.alert('지금은 이용할 수 없어요!')}>문의</div>
-      </StickyHeader>
-
-      <ProductDetail>
-        <MainImage ref={productDesc_ref} img_url={'https://img-cf.kurly.com/shop/data/goodsview/20220531/gv00000321516_1.jpg'}/>
-        <div>
-          <h3>쌈채소부터 샐러드까지 다채롭게</h3>
-          <h2>친환경 로메인 (적/청)</h2>
         </div>
-        <hr/>
-        <p ref={productDetail_ref}>로메인은 이제 상추만큼이나 친숙한 채소로 자리 잡았죠. 산뜻한 샐러드는 물론이고, 샌드위치의 속재료나 쌈채소로도 다양하게 활용할 수 있는데요. 이번에는 두 가지 색상의 로메인을 수확한 그대로 보내드릴게요. 아삭아삭하면서 청량감이 퍼지는 청로메인과 좀 더 부드러운 식감의 적로메인이랍니다. 농약을 사용하지 않고 깨끗하게 기른 채소라 생으로 먹기에도 안심일 거예요. 싱그러움 가득한 친환경 로메인으로 오늘의 밥상에 생기를 더해 보세요.</p>
-        <AdditionalInfo src={'img/additionalInfo.jpg'} />
-      </ProductDetail>
-
-    </Wrap>
+      </CartFooter>
+    </>
   );
 }
 
@@ -212,7 +268,7 @@ const TotalPrice = styled.div`
 `
 
 const ButtonArea = styled.div`
-  margin: 10px 0px 80px;
+  margin: 10px 0px 60px;
   display:flex;
   gap: 8px;
 `
@@ -228,7 +284,7 @@ const HeartBtn = styled.button`
   border-radius: 3px;
   font-size : 27px;
   padding:0px;
-  color: #5f0081;
+  color: ${(props) => props.heartTogle ? '#5f0081' : '#FF5A5A'};
   cursor:pointer;
 `
 
@@ -246,11 +302,12 @@ const BellBtn = styled.button`
   color: #ccc;
 `
 
-const StickyHeader =styled.div`
+const StickyHeader = styled.div`
   position:sticky;
   top:0px;
   display:flex;
   width: 1010px;
+  margin-top: 20px;
 
   div{
     display:flex;
@@ -312,8 +369,60 @@ const MainImage = styled.div`
   scroll-margin: 80px;
 `
 const AdditionalInfo = styled.img`
-  margin-top: 100px;
+  margin: 100px 0px;
   width: 1000px;
 `
+
+const CartFooter = styled.div`
+  background-color: #fff;
+  border-top: 2px solid #5f0081;
+  width: 100vw;
+  position: fixed;
+  bottom: ${(props) => props.cartFooterOpen ? '0px' : '-265px'};
+  
+  #footerContent {
+    display:flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 900px;
+    margin: auto;
+  }
+
+  .cart_num {
+    margin-left: 8px;
+    font-size : 28px;
+    font-weight: 700;
+  }
+  
+`
+const Arrow = styled.span`
+font-size: 16px;
+margin: 5px 0px 0px 8px;
+`
+
+const CartItem = styled.div`
+  display:flex;
+  align-items: center;
+  margin : 20px 0px 0px;
+  padding: 7px 20px; 
+  border-radius: 3px;
+  width: 900px;
+  background-color: #f7f7f7;
+  color: #333;
+  font-size: 15px;
+
+  h5 {
+    font-size: 15px;
+    font-weight: 400; 
+    width: 600px;
+    margin: 0px 10px;
+  }
+
+  p {
+    font-weight: 700;
+    margin: 0px 0px 0px 100px;
+  }
+`
+
 
 export default Detail;
