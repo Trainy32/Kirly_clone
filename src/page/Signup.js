@@ -8,6 +8,7 @@ import axios from 'axios'
 import Modal from "../components/Modal";
 import Alert from "../components/Alert";
 import FindAddress from "../components/FindAddress";
+import TermsView from "../components/TermsView";
 
 // CSS 관련
 import styled from 'styled-components'
@@ -24,41 +25,93 @@ const Signup = (props) => {
   const [modalMsg, setModalMsg] = useState('잘못된 요청입니다.')
 
   // 주소받아오기 
-  const [address, setAddress] = useState(null)
-
-  console.log(address)
+  const [address, setAddress] = React.useState(null)
 
   const getAddress = () => {
     setModalType('address')
     setModalOpen(true)
   }
 
-  // 중복검사
-  const [idDupCheck, setIdDupCheck] = useState(false)
-  const [emailDupCheck, setEmailDupCheck] = useState(false)
-
-  const dupCheckAction = (type) => {
- 
-    if(type === 'id') {
-      setModalType('alert')
-      setModalMsg('아이디를 입력해주세요')
-      setModalOpen(true)
-    } else if (type === 'email') {
-      setModalType('alert')
-      setModalMsg('이메일을 입력해주세요.')
-      setModalOpen(true)
-    }
-  }
-
   // 회원정보 받아오기
   const id_ref = React.useRef(null)
   const pw_ref = React.useRef(null)
-  const pwCheck_ref = React.useRef(null)
+  const pwConfirm_ref = React.useRef(null)
   const name_ref = React.useRef(null)
   const email_ref = React.useRef(null)
   const tel_ref = React.useRef(null)
   const subAddress_ref = React.useRef(null)
 
+  // 아이디, 비밀번호 양식 체크
+
+  const [idFormCheck, setIdFormCheck] = useState(null)
+  
+  const checkId = (e) => {
+    setIdDupCheck(false)
+    setIdFormCheck(/^[a-zA-Z0-9]{6,}/g.test(e.target.value))
+  }
+
+  const [pwLengthCheck, setPwLengthCheck] = useState(null)
+  const [pwFormCheck, setPwFormCheck] = useState(null)
+  const [pwRepeatLetterCheck, setPwRepeatLetterCheck] = useState(null)
+
+  const checkPw = (e) => {
+    setPwLengthCheck(e.target.value.length > 10)
+    setPwRepeatLetterCheck(!/([0-9a-zA-Z])\1{2,}/.test(e.target.value))
+
+    const num = e.target.value.search(/[0-9]/g)
+    const eng = e.target.value.search(/[a-z]/ig)
+    const spe = e.target.value.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi)
+
+    setPwFormCheck((num >= 0 && eng >= 0) || (num >= 0 && spe >= 0) || (eng >= 0 && spe >= 0))
+    setPwConfirmCheck(pwConfirm_ref.current?.value === pw_ref.current?.value && pwConfirm_ref.current?.value !== '')
+  }
+
+  const [PwConfirmCheck, setPwConfirmCheck] = useState(null)
+
+  // 중복검사
+  const [idDupCheck, setIdDupCheck] = useState(false)
+  const [emailDupCheck, setEmailDupCheck] = useState(false)
+
+  const dupCheckAction = (type) => {
+
+    if(type === 'id') {
+    const requestUrl = 'http://localhost:5001/signup-test'
+    const currentValue = id_ref.current.value
+
+      if (idFormCheck) {
+        axios.get(requestUrl)
+          .then(response => response.data.find((v) => v.username === currentValue))
+          .then(response => {
+            setIdDupCheck(!response)
+            window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
+          })
+      } else {
+        setModalType('alert')
+        setModalMsg('아이디를 입력해주세요.')
+        setModalOpen(true)
+      }
+    }
+
+   if(type === 'email') {
+    const requestUrl = 'http://localhost:5001/signup-test'
+    const currentValue = email_ref.current.value
+    const emailFormCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(currentValue)
+
+      if (emailFormCheck) {
+        axios.get(emailFormCheck)
+          .then(response => response.data.find((v) => v.email === currentValue))
+          .then(response => {
+            setIdDupCheck(!response)
+            window.alert(response ? '이미 등록된 아이디입니다.' : '사용이 가능합니다.')
+          })
+      } else {
+        setModalType('alert')
+        setModalMsg('이메일 양식을 확인해주세요.')
+        setModalOpen(true)
+      }
+   }
+
+  }
 
 
   // 회원가입
@@ -66,27 +119,28 @@ const Signup = (props) => {
 
     const alertMsg =
       id_ref.current.value === '' ? '아이디를 입력해주세요'
-        : !idDupCheck ? '아이디 중복 확인을 해주세요'
+        : !idDupCheck ? '아이디 중복을 확인 해주세요'
           : pw_ref.current.value === '' ? '비밀번호를 입력해주세요'
-            : pwCheck_ref.current.value === '' ? '비밀번호를 한번 더 입력해주세요'
-              : pw_ref.current.value === pwCheck_ref.current.value ? '비밀번호 확인이 일치하지 않아요'
+            : pwConfirm_ref.current.value === '' ? '비밀번호를 한번 더 입력해주세요'
+              : pw_ref.current.value !== pwConfirm_ref.current.value ? '비밀번호 확인이 일치하지 않아요'
                 : name_ref.current.value === '' ? '이름을 입력해주세요'
                   : email_ref.current.value === '' ? '이메일 형식을 확인해주세요'
-                    : !emailDupCheck ? '이메일 중복 확인을 해주세요'
-                      : requiredCheck ? '필수 동의 항목에 체크해주세요'
-                        : ''
+                    : !emailDupCheck ? '이메일 중복을 확인 해주세요'
+                      : tel_ref.current.value === '' ? '휴대폰 번호를 입력해주세요'
+                        : requiredCheck ? '필수 동의 항목에 체크해주세요'
+                          : 'pass'
 
-
-    if (requiredCheck) {
+                          
+    if (alertMsg === 'pass') {
       const userData = {
         username: id_ref.current.value,
-        password: pwCheck_ref.current.value,
+        password: pwConfirm_ref.current.value,
         nickname: name_ref.current.value,
         email: email_ref.current.value,
         phone: tel_ref.current.value,
-        address: '서울시 00구 00로00길 10',
-        addressDetail: '00동 00호',
-        zoneNo: 12345
+        address: address.address,
+        addressDetail: subAddress_ref.current.value,
+        zonecode: address.zoneCode
       }
 
       axios.post('http://localhost:5001/signup-test', userData)
@@ -94,6 +148,15 @@ const Signup = (props) => {
 
     } else {
       window.alert(alertMsg)
+
+      const inputAtIssue =
+        id_ref.current.value === '' || !idDupCheck ? id_ref
+          : pw_ref.current.value === '' ? pw_ref
+            : pw_ref.current.value !== pwConfirm_ref.current.value ? pwConfirm_ref
+              : name_ref.current.value === '' ? name_ref
+                : !emailDupCheck ? email_ref : tel_ref
+
+      inputAtIssue.current.focus()
     }
   }
 
@@ -131,19 +194,27 @@ const Signup = (props) => {
     setEmailMktCheck(!allMktCheck)
   }
 
+  // 약관 보기 
+  const [TermsType, setTermsType] = useState(false)
+
+  const viewTerms = (type) => {
+    setModalType('terms')
+    setTermsType(type)
+    setModalOpen(true)
+  }
+
 
   return (
     <>
-
-
-      { modalOpen ? 
-      <Modal setModalOpen={setModalOpen} btn={false}>
-        {
-        modalType === 'alert' ? <Alert msg={modalMsg} />
-        : modalType === 'address' ? <FindAddress setAddress={setAddress} setModalOpen={setModalOpen}/>
-        : '잘못된 접근입니다'
-        }
-      </Modal> : null }
+      {modalOpen ?
+        <Modal setModalOpen={setModalOpen} btn={modalType === 'address' ? false : true}>
+          {
+            modalType === 'alert' ? <Alert msg={modalMsg} />
+              : modalType === 'address' ? <FindAddress setAddress={setAddress} setModalOpen={setModalOpen} />
+                : modalType === 'terms' ? <TermsView TermsType={TermsType} />
+                  : '잘못된 접근입니다'
+          }
+        </Modal> : null}
 
       <Wrap>
         <button onClick={() => navigate('/login')}> 임시: 로그인 가기</button>
@@ -155,32 +226,36 @@ const Signup = (props) => {
           <tbody>
             <tr>
               <th> <h4>아이디<RedStar>*</RedStar></h4> </th>
-              <td> <input ref={id_ref} type='text' onChange={() => setIdDupCheck(false)} placeholder="6자 이상의 영문 혹은 영문과 숫자를 조합" />
-                <ul>
-                  <li>6자 이상의 영문 혹은 영문과 숫자를 조합</li>
-                  <li>아이디 중복확인</li>
-                </ul>
+              <td> <input ref={id_ref} type='text' onChange={(e) => checkId(e)} placeholder="6자 이상의 영문 혹은 영문과 숫자를 조합" />
+                {/* <ValidityList displayed={'none'}> */}
+                <ValidityList>
+                  <ValidityInfo is_valid={idFormCheck}>6자 이상의 영문 혹은 영문과 숫자를 조합</ValidityInfo>
+                  <ValidityInfo is_valid={idDupCheck}>아이디 중복확인</ValidityInfo>
+                </ValidityList>
               </td>
               <td> <button className="checkBtn" onClick={() => dupCheckAction('id')}> 중복 확인 </button> </td>
             </tr>
 
             <tr>
               <th><h4>비밀번호<RedStar>*</RedStar></h4></th>
-              <td><input ref={pw_ref} type='password' placeholder="비밀번호를 입력해주세요" />
-                <ul>
-                  <li>10자 이상 입력</li>
-                  <li>영문/숫자/특수문자(공백제외)만 허용하며, 2개 이상 조합</li>
-                  <li>동일한 숫자 3개 이상 연속 사용 불가</li>
-                </ul>
+              <td><input ref={pw_ref} onChange={(e) => checkPw(e)} type='password' placeholder="비밀번호를 입력해주세요" />
+                <ValidityList>
+                  <ValidityInfo is_valid={pwLengthCheck}>10자 이상 입력</ValidityInfo>
+                  <ValidityInfo is_valid={pwFormCheck} >영문/숫자/특수문자(공백제외)만 허용하며, 2개 이상 조합</ValidityInfo>
+                  <ValidityInfo is_valid={pwRepeatLetterCheck}>동일한 숫자 3개 이상 연속 사용 불가</ValidityInfo>
+                </ValidityList>
               </td>
             </tr>
 
             <tr>
               <th><h4>비밀번호 확인<RedStar>*</RedStar></h4></th>
-              <td><input ref={pwCheck_ref} type='password' placeholder="비밀번호를 한번 더 입력해주세요" />
-                <ul>
-                  <li>동일한 비밀번호를 입력해주세요.</li>
-                </ul>
+              <td><input ref={pwConfirm_ref} onChange={(e)=> setPwConfirmCheck(pwConfirm_ref.current?.value === pw_ref.current?.value && pwConfirm_ref.current?.value !== '')}
+                  type='password' placeholder="비밀번호를 한번 더 입력해주세요" />
+
+                <ValidityList>
+                  <ValidityInfo is_valid={PwConfirmCheck}>
+                    동일한 비밀번호를 입력해주세요.</ValidityInfo>
+                </ValidityList>
               </td>
             </tr>
 
@@ -202,64 +277,70 @@ const Signup = (props) => {
 
             <tr>
               <th><h4>주소</h4></th>
-              <td><button className="addressBtn" onClick={getAddress}> <IoSearch /> 주소 검색 </button>
-              <input type='text' value={address?.address}/>
-              <input type='text' />
+              <td>
+                {address ?
+                  <><input type='text' value={address?.address} readOnly />
+                    <input type='text' defaultValue={address?.addressDetail} ref={subAddress_ref} placeholder="나머지 주소를 입력해주세요" /></>
+                  : <button className="addressBtn" onClick={getAddress}> <IoSearch /> 주소 검색 </button>
+                }
                 <br /><sub>배송지에 따라 상품 정보가 달라질 수 있습니다.</sub></td>
-              { address ? <td><button className="checkBtn"> <IoSearch /> 재검색 </button></td> : null}
+
+              {address ? <td><button className="checkBtn" onClick={getAddress}> <IoSearch /> 재검색 </button></td> : null}
             </tr>
 
-            
             <MidLine>
-              <td colSpan='3'/>
+              <td colSpan='3' />
             </MidLine>
 
 
             <TermsSection>
               <th><h4>이용약관 동의<RedStar>*</RedStar></h4></th>
-              <td colSpan='2'><AllTermsLabel> <CheckBox is_checked={allCheck}><HiCheck/></CheckBox>
+              <td colSpan='2'><AllTermsLabel> <CheckBox is_checked={allCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={allCheck} onChange={() => allCheckAction()} />전체 동의합니다. </AllTermsLabel>
-                  <sub>선택항목에 동의하지 않은 경우도 회원가입 및 일반적인 서비스를 이용할 수 있습니다. </sub></td>
+                <sub>선택항목에 동의하지 않은 경우도 회원가입 및 일반적인 서비스를 이용할 수 있습니다. </sub></td>
             </TermsSection>
 
             <tr>
               <td />
-              <td ><TermsLabel> <CheckBox is_checked={useTermCheck}><HiCheck/></CheckBox>
+              <td ><TermsLabel> <CheckBox is_checked={useTermCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={useTermCheck} onChange={() => setUseTermCheck(!useTermCheck)} />
                 이용약관 동의 <span>(필수)</span> </TermsLabel>
               </td>
-              <td><TermsBtn>약관보기 ></TermsBtn></td>
+              <td><TermsBtn onClick={() => viewTerms({ type: 'use', title: '이용약관 동의', isRequired: true })}>
+                약관보기 &gt;</TermsBtn></td>
             </tr>
 
             <tr>
               <td />
-              <td><TermsLabel> <CheckBox is_checked={privacyCheck}><HiCheck/></CheckBox>
+              <td><TermsLabel> <CheckBox is_checked={privacyCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={privacyCheck} onChange={() => setPrivacyCheck(!privacyCheck)} />
                 개인정보 수집·이용동의 <span>(필수)</span> </TermsLabel>
               </td>
-              <td><TermsBtn>약관보기 ></TermsBtn></td>
+              <td><TermsBtn onClick={() => viewTerms({ type: 'privacy', title: '개인정보 수집·이용동의', isRequired: true })}>
+                약관보기 &gt;</TermsBtn></td>
             </tr>
 
             <tr>
               <td />
-              <td><TermsLabel> <CheckBox is_checked={optPrivacyCheck}><HiCheck/></CheckBox>
+              <td><TermsLabel> <CheckBox is_checked={optPrivacyCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={optPrivacyCheck} onChange={() => setOptPrivacyCheck(!optPrivacyCheck)} />
                 개인정보 수집·이용동의<span>(선택)</span> </TermsLabel>
               </td>
-              <td><TermsBtn>약관보기 > </TermsBtn></td>
+              <td><TermsBtn onClick={() => viewTerms({ type: 'optPrivacy', title: '개인정보 수집·이용동의', isRequired: false })}>
+                약관보기 &gt; </TermsBtn></td>
             </tr>
 
             <tr>
               <td />
               <td colSpan='2'>
-                <TermsLabel> <CheckBox is_checked={allMktCheck}><HiCheck/></CheckBox>
+                <TermsLabel> <CheckBox is_checked={allMktCheck}><HiCheck /></CheckBox>
                   <input type='checkbox' checked={allMktCheck} onChange={() => MktCheckAction()} />
                   무료배송,할인쿠폰 등 혜택/정보 수신동의<span>(선택)</span></TermsLabel>
                 <MktCheck>
                   <div>
-                    <TermsLabel> <CheckBox is_checked={smsMktCheck}><HiCheck/></CheckBox>
+                    <TermsLabel> <CheckBox is_checked={smsMktCheck}><HiCheck /></CheckBox>
                       <input type='checkbox' checked={smsMktCheck} onChange={() => setSmsMktCheck(!smsMktCheck)} />SMS</TermsLabel>
-                    <TermsLabel> <CheckBox is_checked={emailMktCheck}><HiCheck/></CheckBox>
+                    <TermsLabel> <CheckBox is_checked={emailMktCheck}><HiCheck /></CheckBox>
                       <input type='checkbox' checked={emailMktCheck} onChange={() => setEmailMktCheck(!emailMktCheck)} />이메일</TermsLabel>
                   </div>
                   <p> └ 동의 시 한 달간 [5%적립] + [2만원 이상 무료배송] 첫 주문 후 안내</p>
@@ -269,7 +350,7 @@ const Signup = (props) => {
 
             <tr>
               <td />
-              <td><TermsLabel><CheckBox is_checked={ageCheck}><HiCheck/></CheckBox>
+              <td><TermsLabel><CheckBox is_checked={ageCheck}><HiCheck /></CheckBox>
                 <input type='checkbox' checked={ageCheck} onChange={() => setAgeCheck(!ageCheck)} />
                 본인은 만 14세 이상입니다.<span>(필수)</span></TermsLabel>
               </td>
@@ -372,21 +453,22 @@ const InputFields = styled.table`
     width: 350px;
   }
 
-  ul {
-    margin: 0px 20px 20px 0px;
-    padding: 0px 20px;
-
-  }
-
-  li {
-    font-size: 12px;
-    font-weight: 400;
-    color: #666;
-  }
-
   sub {
     color: #666;
   }
+`
+
+const ValidityList = styled.ul`
+  display: ${(props) => props.displayed};
+  margin: 0px 20px 20px 0px;
+  padding: 0px 20px;
+`
+
+const ValidityInfo = styled.li`
+    font-size: 12px;
+    font-weight: 400;
+    color: ${(props) => props.is_valid ? '#0f851a' : '#b3130b'};
+    /* #666; */
 `
 
 const MidLine = styled.tr`
