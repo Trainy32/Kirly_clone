@@ -18,11 +18,9 @@ const FindAddress = (props) => {
   const [mainAddress, setMainAddress] = React.useState(null)
   const detailAdr_ref = React.useRef(null)
 
-  console.log(props)
 
   // 기본 주소 받아오는 함수. 도로명, 건물명, 우편번호
   const handleComplete = (data) => {
-    console.log(data)
     let fullAddress = data.address;
     let extraAddress = '';
 

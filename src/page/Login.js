@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom'
+
 import axios from 'axios'
+import instance, { customAxios } from "../shared/Request";
 
 // CSS 관련 
 import { HiCheck } from 'react-icons/hi';
@@ -13,20 +15,22 @@ const Login = (props) => {
 
   const [secureLogin, setSecureLogin] = useState(true)
 
-  const loginAction =  () => {
+  const loginAction =  (e) => {
+    // e.preventDefault()
 
     if (id_ref.current.value === '' || pw_ref.current.value === '') {
       window.alert('아이디 혹은 패스워드를 정확히 입력해주세요')
     } else {
-      window.alert('아직 기능없찌롱 ><')
-
       const loginData = {
         username : id_ref.current.value,
         password : pw_ref.current.value 
       }
-  
-      axios.post('http://localhost:5001/login-test', loginData)
-      .then(response => console.log(response))
+
+      customAxios.post('/api/user/login', loginData)
+      .then(response => {
+        console.log(response)
+      })
+
     }
   }
 
@@ -41,7 +45,7 @@ const Login = (props) => {
         <label> <input checked={secureLogin} onChange={() => setSecureLogin(!secureLogin)} type='checkbox' />보안접속</label>
       </LoginOptions>
 
-      <button className="loginBtn" onClick={loginAction} >로그인</button>
+      <button className="loginBtn" onClick={(e) => loginAction(e)} >로그인</button>
       <button className="joinBtn" onClick={() => navigate('/signup')}>회원가입</button>
     </Wrap>
   );
