@@ -8,26 +8,31 @@ const QtyBtn = (props) => {
   const qty = props.qty
   const setQty = props.setQty
   const qty_ref = React.useRef(null)
+  const minVal = props.minVal ? props.minVal : 0
 
   React.useEffect(()=>{
     qty_ref.current.value = qty
   },[qty])
 
   const substract = () => {
-    if(qty > 0) {
+    if(qty > minVal) {
       setQty(qty-1)
     }
   }
 
   return (
     <BtnWrap>
-      <button onClick={substract}><FaMinus /></button>
+      <Minus onClick={substract} qty={qty} min={minVal} ><FaMinus /></Minus>
       <input ref={qty_ref} defaultValue={1} readOnly/>
       <button onClick={()=> setQty(qty+1)}><FaPlus /></button>
     </BtnWrap>
   )
 
 }
+
+const Minus = styled.button`
+  color: ${(props) => props.qty === props.min ? '#ccc':'#333'};
+`
 
 const BtnWrap = styled.div`
   display:flex;
@@ -52,6 +57,7 @@ const BtnWrap = styled.div`
     font-size : 11px;
     cursor: pointer;
   }
+
   input{
     width: 25px;
     background-color: #fff;

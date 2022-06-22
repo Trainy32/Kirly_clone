@@ -4,17 +4,21 @@ import React from "react";
 import styled from 'styled-components'
 
 const PointsTag = (props) => {
+  const isLogin = props.isLogin
   const content = props.children
-  
+  const fontSize = props.fontSize
+  const color = props.color
+  const style = props.style
+
   return (
-    <Wrap> <Tag>적립</Tag> 구매 시 <span>{content}원 적립</span> </Wrap>
+    <Wrap fontSize={fontSize} color={color} style={style}> <Tag>적립</Tag> 구매 시 <span>{content}원 적립</span> </Wrap>
   )
 
 }
 
 const Wrap = styled.div`
-font-size: 14px;
-color: #333;
+font-size: ${(props) => props.fontSize ? props.fontSize : '14px'};
+color: ${(props) => props.color ? props.color : '#333'};
 
 span {
   font-weight: 500;

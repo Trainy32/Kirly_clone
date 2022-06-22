@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from 'styled-components'
-import { VscAdd } from 'react-icons/vsc';
 
 const Alert = (props) => {
   const msg = props.msg;

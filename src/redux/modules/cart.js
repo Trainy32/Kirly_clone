@@ -1,36 +1,161 @@
 import axios from 'axios'
 import instance from '../../shared/Request'
 
-
 // 액션
-const LOAD = 'posts/LOAD'
+const LOAD = 'cart/LOAD'
+const LOADLOCAL = 'cart/LOADLOCAL'
+const SELECT = 'cart/SELECT'
+const ADD = 'cart/ADD'
+const UPDATEQTY = 'cart/UPDATEQTY'
+const DELETE = 'cart/DELETE'
 
 // 액션생성함수
-export function load_posts(post_list) {
-  return { type: LOAD, post_list }
+export function load_cart(item_list) {
+  return { type: LOAD, item_list }
+}
+
+export function load_local_cart(item_list) {
+  return { type: LOADLOCAL, item_list }
+}
+
+export function select_item(item_data, is_selected) {
+  return { type: SELECT, item_data }
+}
+
+export function add_cart(item_data) {
+  return { type: ADD, item_data }
+}
+
+export function update_qty(item_data) {
+  return { type: UPDATEQTY, item_data }
+}
+
+export function delete_cart(delete_list) {
+  return { type: DELETE, delete_list }
 }
 
 //미들웨어
-export const load_posts_like_AX = () => {
+export const load_cart_AX = () => {
   return function (dispatch) {
-    axios.get('http://54.180.121.151/api/posts/likes')
-    .then(response => dispatch(load_posts(response.data.posts)))
+    axios.get('http://localhost:5001/cart-test')
+      .then(response => {
+        const cartData = response.data.map((category) => {
+            if (category.result) {
+              const newData = category.data.map((item) => ({ ...item, selected: true }))
+              return { ...category, data: newData }
+            } else {
+              return category
+            }
+          }
+        )
+        dispatch(load_cart(cartData))
+      })
+      .catch((err) => {
+        console.log(err)
+        window.alert('에러가 발생했어요 ㅠㅠ!')
+      })
+  }
+}
+
+export const load_local_cart_AX = () => {
+  return function (dispatch) {
+    axios.get('http://localhost:5001/cart-test')
+      .then(response => dispatch(load_cart(response.data)))
+      .catch((err) => {
+        console.log(err)
+        window.alert('에러가 발생했어요 ㅠㅠ!')
+      })
+  }
+}
+
+export const add_cart_AX = (item_data) => {
+  return function (dispatch) {
+    axios.post('http://localhost:5001/cart-test?package=냉동', item_data)
+      .then(response => dispatch(load_cart(response.data)))
+      .catch((err) => {
+        console.log(err)
+        window.alert('에러가 발생했어요 ㅠㅠ!')
+      })
+  }
+}
+
+export const update_qty_AX = (item_data) => {
+  return function (dispatch) {
+    axios.get('http://localhost:5001/cart-test')
+      .then(response => dispatch(update_qty(item_data)))
+      .catch((err) => {
+        console.log(err)
+        window.alert('에러가 발생했어요 ㅠㅠ!')
+      })
+  }
+}
+
+export const delete_cart_AX = (delete_list) => {
+  return function (dispatch) {
+    axios.get('http://localhost:5001/cart-test')
+      .catch((err) => {
+        console.log(err)
+        window.alert('에러가 발생했어요 ㅠㅠ!')
+      });
+
+    delete_list.forEach((v) => {
+      dispatch(delete_cart(v.productId))
+    })
+
   }
 }
 
 // 초기값
 const initialState = {
+  is_loaded: false,
   list: [{}],
+  selectedItems: [{}]
 }
+
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case 'posts/LOAD': {
-      return { is_loaded: true, list: action.post_list }
+    case 'cart/LOAD': {
+      const selected = state.list.filter((category)=> category.response).map((category) => category.data).flat()
+      return { ...state, is_loaded: true, list: action.item_list, selectedItems:selected }
+    }
+
+    case 'cart/LOADLOCAL': {
+      return { ...state, is_loaded: true, list: action.item_list }
+    }
+
+    case 'cart/SELECT': {
+      const new_item_list = state.list.map((category) => {
+        if (category.package === action.item_data.package){
+          return category.data.map((item) => item.detailId === action.item_data.detailId ? {...item, selected: action.is_selected} : item)
+        }else {
+          return category
+        }
+      })
+      return { ...state, list: new_item_list }
+    }
+
+    case 'cart/Add': {
+      return { ...state, list: [...state.list, action.item_data] }
+    }
+
+    case 'cart/UPDATEQTY': {
+      const new_item_list = state.list.map((category) => {
+        if (category.package === action.item_data.package){
+          return category.data.map((item) => item.detailId === action.item_data.detailId ? {...item, quantity: action.item_data.quantity} : item)
+        }else {
+          return category
+        }
+      })
+      return { ...state, list: new_item_list }
+    }
+
+    case 'cart/DELETE': {
+      const new_item_list = state.list.filter((v, i) => parseInt(action.detailId) !== i);
+      return { ...state, list: new_item_list }
     }
 
     default:
       return state;
-
   }
 }
 

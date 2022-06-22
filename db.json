@@ -60,6 +60,52 @@
       "viewTable": " <table><thead></thead><tbody></tbody></table>"
     }
   ],
+  "cart-test": [
+    {
+      "package": "냉장",
+      "result": true,
+      "responseMsg": "냉장 상품 조회에 성공했습니다.",
+      "data": [{
+        "detailId": 1,
+        "name": "감자",
+        "thumb": "https://img-cf.kurly.com/shop/data/goods/1653965528732y0.jpg",
+        "price": 3600,
+        "quantity": 2
+      },
+      {
+        "detailId": 2,
+        "name": "감자",
+        "thumb": "https://img-cf.kurly.com/shop/data/goods/1653965528732y0.jpg",
+        "price": 3600,
+        "quantity": 2
+      }]
+      },
+      {
+        "package": "냉동",
+        "result": true,
+        "responseMsg": "등록된 냉동 제품이 없습니다.",
+        "data": [{
+          "detailId": 1,
+          "name": "감자",
+          "thumb": "https://img-cf.kurly.com/shop/data/goods/1653965528732y0.jpg",
+          "price": 3600,
+          "quantity": 2
+        },
+        {
+          "detailId": 2,
+          "name": "감자",
+          "thumb": "https://img-cf.kurly.com/shop/data/goods/1653965528732y0.jpg",
+          "price": 3600,
+          "quantity": 2
+        }]
+      },
+      {
+        "package":"상온",
+        "result":false,
+        "responseMsg": "등록된 상온 제품이 없습니다.",
+        "data": null
+      }
+  ],
   "list-test": [
     {
       "id": 1,

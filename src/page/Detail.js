@@ -1,14 +1,16 @@
 import React from "react";
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
-import axios from 'axios'
-import instance, { customAxios } from "../shared/Request";
+import instance,{customAxios} from "../shared/Request";
+
+import { useDispatch, useSelector } from 'react-redux'
+import { add_cart_AX } from "../redux/modules/cart";
 
 // CSS 관련
 import styled from 'styled-components'
 import { BiShareAlt } from 'react-icons/bi'
 import { VscHeart, VscBell } from 'react-icons/vsc'
-import { IoMdHeart, IoMdHeartEmpty } from 'react-icons/io'
+import { IoMdHeart } from 'react-icons/io'
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs'
 
 // 컴포넌트
@@ -17,9 +19,9 @@ import QtyBtn from "../Elements/QtyBtn";
 import SquareBtn from "../Elements/SquareBtn";
 import PointsTag from "../Elements/PointsTag";
 import ScrollBtn from "../Elements/ScrollBtn";
-import AddToCart from "../components/AddToCart";
 
 const Detail = (props) => {
+  const dispatch = useDispatch()
   const params = useParams()
   const isLogin = props.isLogin
 
@@ -27,9 +29,11 @@ const Detail = (props) => {
   const [heartTogle, setHeartTogle] = React.useState(null)
 
   React.useEffect(() => {
-  customAxios.get('/api/product/' + params.productId)
+    customAxios.get('/api/product/' + params.productId)
   .then(response => setThisProduct(response.data))
-  }, [])
+
+  // console.log('loading')
+  }, [params.productId])
 
   console.log(thisProduct)
 
@@ -41,12 +45,13 @@ const Detail = (props) => {
 
   const CartAction = () => {
     const newCartItem = {
+    productId:params.productId,
     name:thisProduct?.name,
     thumb: thisProduct?.thumb,
     price: thisProduct?.price,
     qty: qty
   }
-    AddToCart(newCartItem)
+    dispatch(add_cart_AX(newCartItem))
   }
 
   // 스크롤 메뉴를 위한 ref 
@@ -113,7 +118,7 @@ const Detail = (props) => {
             <ButtonArea>
               <HeartBtn heartTogle={heartTogle} onClick={()=> setHeartTogle(!heartTogle)}> { heartTogle ? <IoMdHeart /> : <VscHeart /> }</HeartBtn>
               <BellBtn><VscBell /></BellBtn>
-              <SquareBtn filled={true} style={{ width: '76%' }} onClick={CartAction}>장바구니 담기</SquareBtn>
+              <SquareBtn filled={true} width={'370px'} onClick={CartAction}>장바구니 담기</SquareBtn>
             </ButtonArea>
 
 
@@ -158,9 +163,9 @@ const Detail = (props) => {
             <PointsTag>0</PointsTag>
           </Sum>
           <ButtonArea>
-            <HeartBtn><VscHeart /></HeartBtn>
+            <HeartBtn heartTogle={heartTogle} onClick={()=> setHeartTogle(!heartTogle)}> { heartTogle ? <IoMdHeart /> : <VscHeart /> }</HeartBtn>
             <BellBtn><VscBell /></BellBtn>
-            <SquareBtn filled={true} style={{ width: '300px' }} onClick={CartAction}>장바구니 담기</SquareBtn>
+            <SquareBtn filled={true} width={'300px'} onClick={CartAction}>장바구니 담기</SquareBtn>
           </ButtonArea>
         </div>
       </CartFooter>
