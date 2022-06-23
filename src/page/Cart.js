@@ -3,6 +3,8 @@ import React from "react";
 // 리덕스 관련 Imports
 import { useDispatch, useSelector } from 'react-redux'
 import { load_cart_AX } from "../redux/modules/cart";
+import { load_local_cart } from "../redux/modules/cartLocal";
+
 
 // CSS 관련
 import styled from 'styled-components'
@@ -28,14 +30,20 @@ function Cart() {
   const userCart = useSelector((state) => state.cart.list)
   const selectedItems = useSelector((state) => state.cart.itemsOnly)
 
+  console.log(userCart)
+
   // 전체 선택하기    
   const [isAllCheck, setIsAllCheck] = React.useState(true)
   const [checkChange, setCheckChange] = React.useState(isAllCheck)
 
-  
+  const [selected, setSelected] = React.useState(isAllCheck)
+
   React.useEffect(() => {
     setSelectedCount(selectedItems?.filter((item) => item.selected).length)
+    setSelected(selectedItems)
   }, [])
+
+  console.log(selectedItems)
 
   const allCheckAction = () =>{
     setIsAllCheck(!isAllCheck)
@@ -59,7 +67,7 @@ function Cart() {
           userCart?.map((category, index) => {
             return category.result ? (
               <CategoryBox key={index}>
-                <CartCategoryTitle type={category.package}/>
+                <CartCategoryTitle type={category.packageType}/>
                 {
                   category.data.map((item, item_index) => (
                     <CartItem key={item_index} data={{...item, package:category}} checkChange={checkChange}/>
@@ -94,7 +102,7 @@ function Cart() {
 
         </DeliverTo>
 
-        <PayEsteem />
+        <PayEsteem selectedItems={selectedItems}/>
 
         <SquareBtn filled={true}>주문하기</SquareBtn>
 

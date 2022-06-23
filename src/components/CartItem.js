@@ -31,8 +31,9 @@ const CartItem = (props) => {
 
   const deleteItem = () => {
     if(window.confirm('삭제하시겠습니까?')){
-      const deleteItem = [{productId:data.detailID}]
+      const deleteItem = [{productId: data.productId}]
       dispatch(delete_cart_AX(deleteItem))
+      window.location.reload()
     }
   }
 

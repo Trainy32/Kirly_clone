@@ -5,16 +5,21 @@ import styled from "styled-components";
 import { useNavigate, useParams } from 'react-router-dom'
 import ToCartBtn from "../Elements/ToCartBtn";
 
+import {getCategoryMenu} from '../function/getCategoryMenu'
+
+import { useDispatch, useSelector } from 'react-redux'
+import { add_cart_AX } from "../redux/modules/cart";
+
 const Category = (props) => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const params = useParams()
 
   const [thisCategory, setThisCategory] = React.useState(null)
-
+ 
   React.useEffect(() => {
     customAxios.get('/api/category/' + params.categoryNo)
       .then(response => {
-        console.log(response)
         setThisCategory(response.data.productDto)
       })
   }, [params.categoryNo])
@@ -26,9 +31,25 @@ const Category = (props) => {
     setOrder(type)
   }
 
+  const CartAction = (e, data) => {
+    e.stopPropagation()
+
+    console.log(data)
+
+    const newCartItem = {
+    productId: data.id,
+    name: data.name,
+    thumb: data.thumb,
+    price: data.price,
+    qty: 1,
+  }
+    dispatch(add_cart_AX(newCartItem))
+    window.alert('추가되었습니다')
+  }
+
   return (
     <Wrap>
-      <Title>신상품</Title>
+      <Title>{getCategoryMenu(params.categoryNo)}</Title>
 
       <Info>
         <span>총 {thisCategory?.length}개</span>
@@ -43,8 +64,8 @@ const Category = (props) => {
       <List>
         {
           thisCategory?.map((p, i) => (
-            <Card key={i}>
-              <Image img_url={p.thumb}><ToCartBtn style={{ position: 'absolute', bottom: '20px', right: '20px' }} /></Image>
+            <Card key={i} onClick={(()=> navigate('/detail/'+p.id))}>
+              <Image img_url={p.thumb}><ToCartBtn onClick={(e)=>CartAction(e, p)} style={{ position: 'absolute', bottom: '20px', right: '20px' }} /></Image>
               <Contents>
                 <h2>{ p.name }</h2>
                 <h3>{ p.price }</h3>

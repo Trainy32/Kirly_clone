@@ -7,18 +7,29 @@ import styled from 'styled-components'
 import PointsTag from "../Elements/PointsTag";
 
 const PayEsteem = (props) => {
-  const selectedItems = useSelector((state) => state.cart.itemsOnly)
+  // const selectedItems = props.selectedItems
 
   const minForFreeDeliver = 50000
   const [subTotal, setSubTotal] = React.useState(0)
   const [deliverFree, setDeliverFree] = React.useState(subTotal > minForFreeDeliver || subTotal === 0 )
   const deliveryCost = deliverFree ? 0 : 3000
 
+  // React.useEffect(()=>{
+  //   const cal = selectedItems?.filter((item) => item.selected).reduce((acc,item) => acc+(item.price * item.quantity),0)
+  //   setSubTotal(cal)
+  //   setDeliverFree(subTotal > minForFreeDeliver || subTotal === 0)
+  // },[selectedItems])
+
+  const userCart = useSelector((state) => state.cart.list)
+  const items = userCart.map((category) => category.result ?  category.data : null).filter((v) => v).flat()
+
+  console.log(items)
+
   React.useEffect(()=>{
-    const cal = selectedItems?.filter((item) => item.selected).reduce((acc,item) => acc+(item.price * item.quantity),0)
-    setSubTotal(cal)
-    setDeliverFree(subTotal > minForFreeDeliver || subTotal === 0)
-  },[selectedItems])
+    setSubTotal(items.reduce((acc,v,i)=> acc + (v.price * v.quantity), 0))
+  },[items])
+
+
 
   return (
     <PayEst>

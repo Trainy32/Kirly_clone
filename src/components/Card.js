@@ -1,11 +1,33 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
+import ToCartBtn from "../Elements/ToCartBtn";
+
+
+import { useDispatch, useSelector } from 'react-redux'
+import { add_cart_AX } from "../redux/modules/cart";
 
 
 const Card = (props) => {
+  const dispatch = useDispatch()
     const navigate = useNavigate();
-    console.log(props);
+
+  const CartAction = (e) => {
+    e.stopPropagation()
+    const newCartItem = {
+    productId: props.id,
+    name: props.name,
+    thumb: props.img,
+    price: props.price,
+    qty: 1,
+  }
+    dispatch(add_cart_AX(newCartItem))
+    window.alert('추가되었습니다')
+  }
+
+
+
+
   return (
     <React.Fragment>
         <DivSt
@@ -15,7 +37,7 @@ const Card = (props) => {
         >
         <CardSt>
           <ImageSt img={props.img}>
-
+          <ToCartBtn  style={{ position: 'absolute', bottom: '20px', right: '20px' }}  onClick={(e)=>CartAction(e)}/>
           </ImageSt>
           <h3 style={{ marginLeft: "4px", fontSize: "16px" }}>
             {props?.name}
@@ -63,6 +85,7 @@ const ImageSt = styled.div`
   background: url('${(props) => props.img}');
   background-size: cover;
   background-position: center;
+  position:relative;
 `;
 
 export default Card;

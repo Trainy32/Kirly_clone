@@ -40,18 +40,7 @@ export const load_cart_AX = () => {
     instance.get('/api/cart')
       .then(response => { 
         console.log(response)
-        dispatch(load_cart(response.data)) })
-      .catch((err) => {
-        console.log(err)
-        window.alert('에러가 발생했어요 ㅠㅠ!')
-      })
-  }
-}
-
-export const load_local_cart_AX = () => {
-  return function (dispatch) {
-    axios.get('http://localhost:5001/cart-test')
-      .then(response => dispatch(load_cart(response.data)))
+        dispatch(load_cart(response.data.cartByTypeList)) })
       .catch((err) => {
         console.log(err)
         window.alert('에러가 발생했어요 ㅠㅠ!')
@@ -61,11 +50,9 @@ export const load_local_cart_AX = () => {
 
 export const add_cart_AX = (item_data) => {
   return function (dispatch) {
-    console.log(item_data)
     instance.post('/api/cart/add/'+item_data.productId, {quantity:item_data.qty})
       .then(response => {
-        console.log(response)
-        dispatch(load_cart(response.data))})
+        dispatch(add_cart(item_data))})
       .catch((err) => {
         console.log(err)
         window.alert('에러가 발생했어요 ㅠㅠ!')
@@ -75,8 +62,11 @@ export const add_cart_AX = (item_data) => {
 
 export const update_qty_AX = (item_data) => {
   return function (dispatch) {
-    axios.get('http://localhost:5001/cart-test')
-      .then(response => dispatch(update_qty(item_data)))
+    instance.put('/api/cart/update/'+item_data.productId, {quantity: item_data.quantity})
+      .then(response => {
+        console.log(response)
+        dispatch(update_qty(item_data))}
+        )
       .catch((err) => {
         console.log(err)
         window.alert('에러가 발생했어요 ㅠㅠ!')
@@ -86,7 +76,8 @@ export const update_qty_AX = (item_data) => {
 
 export const delete_cart_AX = (delete_list) => {
   return function (dispatch) {
-    axios.get('http://localhost:5001/cart-test')
+    console.log(delete_list)
+    instance.delete('/api/cart/delete', {data: delete_list })
       .catch((err) => {
         console.log(err)
         window.alert('에러가 발생했어요 ㅠㅠ!')

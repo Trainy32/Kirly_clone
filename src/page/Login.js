@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom'
 
-import axios from 'axios'
 import instance, { customAxios } from "../shared/Request";
+import { useDispatch, useSelector } from 'react-redux'
+import { set_user } from "../redux/modules/user";
 
 import { setCookie } from "../shared/Cookie";
 
@@ -11,14 +12,15 @@ import { HiCheck } from 'react-icons/hi';
 import styled from 'styled-components'
 
 const Login = (props) => {
-  const navigate = useNavigate()  
+  const navigate = useNavigate() 
+  const dispatch = useDispatch() 
   const id_ref = React.useRef(null)
   const pw_ref = React.useRef(null)
 
   const [secureLogin, setSecureLogin] = useState(true)
 
   const loginAction =  (e) => {
-    e.preventDefault()
+    // e.preventDefault()
 
     if (id_ref.current.value === '' || pw_ref.current.value === '') {
       window.alert('아이디 혹은 패스워드를 정확히 입력해주세요')
@@ -30,9 +32,10 @@ const Login = (props) => {
 
       customAxios.post('/api/user/login', loginData)
       .then(response => {
-        console.log(response)
+        window.alert(response.data.errorMsg)
         // setCookie('Authorization', response.data.token)
         // localStorage.setItem("refresh_token", response.data.refreshToken);
+        dispatch(set_user(response.data.nickname))
         localStorage.setItem("authorization", response.data.token);
       })
     }

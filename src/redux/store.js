@@ -7,9 +7,10 @@ import user from './modules/user'
 import cart from './modules/cart'
 import comment from './modules/comment'
 import products from './modules/products'
+import cartLocal from './modules/cartLocal'
 
 const middlewares = [thunk]
-const rootReducer = combineReducers({ user, cart, comment, products });
+const rootReducer = combineReducers({ user, cart, comment, products, cartLocal });
 const enhancer = applyMiddleware(...middlewares)
 
 

@@ -75,6 +75,7 @@ const Div = styled.div`
     justify-content: center;
     align-items: center;
     font-size: 30px;
+    font-weight: 500;
     margin-top: 60px;
     margin-bottom: 20px;
     font-family: 'Noto Sans KR', sans-serif;
