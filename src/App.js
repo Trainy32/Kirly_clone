@@ -20,10 +20,9 @@ function App() {
   const [isLogin, setIsLogin] =  React.useState(true)
   
   return (
-    <div className="App">
+    <div className="App" style={{overflowX:'hidden'}}>
       <Header/>
       <Routes>
-
         <Route path='/' element={<Main/>} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />

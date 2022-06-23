@@ -2,15 +2,18 @@ import React from "react";
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import kutty from "../css/kutty.png";
-
+import { useDispatch, useSelector } from "react-redux";
+// Icon import
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { BiMap } from 'react-icons/bi';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { BsCart2 } from 'react-icons/bs';
 
-function Header () {
+const Header = () => {
     const navigate = useNavigate();
-
+    const islogin = useSelector((state) => state.user.is_login);
+    const user = useSelector((state) => state.user.username);
+    console.log(islogin, user);
     return (
         <>
         <Head>
@@ -18,11 +21,13 @@ function Header () {
             <Btn>
             <button
               onClick={() => {
+                // <Gen>일반</Gen>
                 navigate("/signup");
               }}
-            >
+              >
               회원가입&nbsp;&nbsp;&nbsp;|
             </button>
+            {islogin ? (
             <button
               onClick={() => {
                 localStorage.clear();
@@ -31,6 +36,7 @@ function Header () {
             >
               로그아웃&nbsp;&nbsp;&nbsp;|
             </button>
+            ) : (
             <button
               onClick={() => {
                 navigate("/login");
@@ -38,6 +44,7 @@ function Header () {
             >
               로그인&nbsp;&nbsp;&nbsp;|
             </button>
+                  )}
                 <Select>
                   <option>고객센터▼</option>
                   <div className="op">
@@ -77,11 +84,11 @@ const Head = styled.div`
   background-position: center;
 `;
 const Home = styled.div`
-/* background-color: green; */
-width: 50%;
-height: 70%;
-cursor: pointer;
-`
+  /* background-color: green; */
+  width: 50%;
+  height: 70%;
+  cursor: pointer;
+  `;
 const Container = styled.div`
   width: 100%;
   height: 30px;
@@ -188,6 +195,11 @@ const Search = styled.input`
   border: none;
   height: 40px;
   margin-right: 20px;
+  border: 0px;
+  outline: none;
+  &:hover {
+    background-color: white;
+  }
 `;
 
 const Select2 = styled.div`
@@ -218,6 +230,21 @@ const Select2 = styled.div`
       visibility: visible;
     }
   }
+`;
+
+const Gen = styled.span`
+  border: 1px solid #5f0080;
+  background-color: #fff;
+  color: #5f0080;
+  margin-top: 1.5px;
+  min-width: 38px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 30px;
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+  margin-right: 3px;
 `;
 
 export default Header;

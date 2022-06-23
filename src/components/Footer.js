@@ -13,7 +13,6 @@ const Footer = (props) => {
         <FooterLeft />
         <FooterRight />
       </Foot>
-
     </React.Fragment>
   );
 };
