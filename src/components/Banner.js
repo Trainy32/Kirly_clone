@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css"
+import Button from "../Elements/Button";
 
 const Banner = (props) => {
     
@@ -13,8 +14,8 @@ const Banner = (props) => {
         slideToScroll: 1,
         autoplay: true,
         autoplaySpeed: 5000,
-        // nextArrow: <Button place="right" margin="0 0 0 590px"/>,
-        // prevArrow: <Button margin="0 0 0 -590px"/>,
+        nextArrow: <Button place="right" margin="0 0 0 590px"/>,
+        prevArrow: <Button margin="0 0 0 -590px"/>,
     };
     
     return (
@@ -24,14 +25,6 @@ const Banner = (props) => {
                     <img 
                         src="https://img-cf.kurly.com/banner/main/pc/img/96d199a4-ce14-43c5-9471-8c816ccd8b64"
                         alt="메인 배너 1"
-                    >
-                    </img>
-                </div>
-                <div>
-                    <img 
-                        src="https://img-cf.kurly.com/banner/main/pc/img/cdd647f0-536e-4754-bc41-a7fdd3787ce5"
-                        alt="메인 배너 2"
-                        height="370px"
                     >
                     </img>
                 </div>
