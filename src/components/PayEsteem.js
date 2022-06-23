@@ -1,11 +1,13 @@
 import React from "react";
 
+import { useDispatch, useSelector } from 'react-redux'
+
 // CSS 관련 Imports
 import styled from 'styled-components'
-
 import PointsTag from "../Elements/PointsTag";
 
 const PayEsteem = (props) => {
+  const selectedItems = useSelector((state) => state.cart.itemsOnly)
 
   const minForFreeDeliver = 50000
   const [subTotal, setSubTotal] = React.useState(0)
@@ -13,9 +15,10 @@ const PayEsteem = (props) => {
   const deliveryCost = deliverFree ? 0 : 3000
 
   React.useEffect(()=>{
-    setSubTotal(0)
+    const cal = selectedItems?.filter((item) => item.selected).reduce((acc,item) => acc+(item.price * item.quantity),0)
+    setSubTotal(cal)
     setDeliverFree(subTotal > minForFreeDeliver || subTotal === 0)
-  },[])
+  },[selectedItems])
 
   return (
     <PayEst>
@@ -31,7 +34,7 @@ const PayEsteem = (props) => {
 
       <dl>
         <dt> 배송비 </dt>
-        <dd> {'+'+deliveryCost.toLocaleString()} <span>원 </span></dd>
+        <dd> {'+ '+deliveryCost.toLocaleString()} <span>원 </span></dd>
       </dl>
       { deliverFree ? null : <p id="freeDelivery"> { (minForFreeDeliver - subTotal).toLocaleString()} 원 추가주문 시, <b>무료배송</b></p> }
       <hr />

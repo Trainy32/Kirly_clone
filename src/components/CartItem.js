@@ -18,17 +18,14 @@ const CartItem = (props) => {
 
   const data = props.data
   const checkChange = props.checkChange
-  const [isChecked, setIsChecked] = React.useState(data.selected)
+  const [isChecked, setIsChecked] = React.useState(true)
 
   React.useEffect(() => {
     setIsChecked(checkChange)
+    dispatch(select_item(data.detailID, isChecked))
   }, [checkChange])
 
-  React.useEffect(() => {
-    dispatch(select_item(data,isChecked))
-  }, [isChecked])
-
-  const [qty, setQty] = React.useState(1)
+  const [qty, setQty] = React.useState(data.quantity)
 
   const priceSum = data.price * qty
 
@@ -39,6 +36,11 @@ const CartItem = (props) => {
     }
   }
 
+  const selectAction = () => {
+    dispatch(select_item(data.detailID, !isChecked))
+    setIsChecked(!isChecked)
+  }
+
   const changeQty = (new_qty) => {
     const updateItem = { ...data, quantity: new_qty }
     dispatch(update_qty_AX(updateItem))
@@ -47,7 +49,7 @@ const CartItem = (props) => {
 
   return (
     <Item>
-      <CheckLabel isChecked={isChecked} setIsChecked={setIsChecked}/>
+      <CheckLabel isChecked={isChecked} setIsChecked={selectAction}/>
       <Thumb img_url={data.thumb}/>
       <h4>{data.name}</h4>
       <QtyBtn qty={qty} setQty={changeQty} minVal={1}/>

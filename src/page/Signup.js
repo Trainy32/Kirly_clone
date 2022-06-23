@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 // 외부 데이터
 import axios from 'axios'
-import instance, { customAxios } from "../shared/Request";
+import { customAxios } from "../shared/Request";
 
 // 컴포넌트
 import Modal from "../components/Modal";
@@ -70,7 +70,7 @@ const Signup = (props) => {
 
   // 전화번호 문자 삭제
   const DeleteAlphabet = () => {
-    tel_ref.current.value =  tel_ref.current.value.toString().replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
+    tel_ref.current.value = tel_ref.current.value.toString().replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
   }
 
   // 중복검사
@@ -78,21 +78,22 @@ const Signup = (props) => {
   const [emailDupCheck, setEmailDupCheck] = useState(false)
 
   const dupCheckAction = (type) => {
-    const RequestUrl = type === 'id' ? ('/api/user/signup/checkId/' + id_ref.current.value) : ('/api/user/signup/checkEmail/' + email_ref.current.value)
+    const requestUrl = type === 'id' ? ('/api/user/signup/checkId/' + id_ref.current.value) : ('/api/user/signup/checkEmail/' + email_ref.current.value)
+    const action = type === 'id' ? setIdDupCheck : setEmailDupCheck
     const typeKOR = type === 'id' ? '아이디' : '이메일'
-    const emailFormCheck = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/.test(email_ref.current.value)
+
+    const emailReg = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i
+    const emailFormCheck = emailReg.test(email_ref.current.value)
 
     if ((type === 'id' && !idFormCheck) || (type === 'email' && !emailFormCheck)) {
       setModalMsg(`${typeKOR} 양식을 확인해주세요`)
       setModalType('alert')
       setModalOpen(true)
     } else {
-      customAxios.get(RequestUrl)
+      customAxios.get(requestUrl)
         .then(response => {
-          setIdDupCheck(response.data)
-          setEmailDupCheck(response.data)
-          // console.log(response.data)
-          window.alert(response.data ? '사용이 가능합니다.' :  `이미 등록된 ${typeKOR}입니다.`)
+          action(response.data)
+          window.alert(response.data ? '사용이 가능합니다.' : `이미 등록된 ${typeKOR}입니다.`)
         })
     }
   }
@@ -111,9 +112,10 @@ const Signup = (props) => {
                   : email_ref.current.value === '' ? '이메일 형식을 확인해주세요'
                     : !emailDupCheck ? '이메일 중복을 확인 해주세요'
                       : tel_ref.current.value === '' ? '휴대폰 번호를 입력해주세요'
-                        : !address ? '주소를 입력해주세요'
-                          : !requiredCheck ? '필수 동의 항목에 체크해주세요'
-                            : 'pass'
+                        : tel_ref.current.value.substr(0, 3) !== '010' ? '휴대폰 번호 양식을 확인해주세요'
+                          : !address ? '주소를 입력해주세요'
+                            : !requiredCheck ? '필수 동의 항목에 체크해주세요'
+                              : 'pass'
 
 
     if (alertMsg === 'pass') {
@@ -129,23 +131,37 @@ const Signup = (props) => {
       }
 
       customAxios.post('/api/user/signup', userData)
-        .then(response => console.log(response))
+        .then(response => {
+          if (response.data.result) {
+            window.alert('가입을 축하드립니다')
+            navigate('/login')
+          }
+          console.log(response)
+        })
         .catch((err) => {
           window.alert('에러가 발생했어요!')
           console.log(err)
-        }) 
+        })
 
     } else {
       window.alert(alertMsg)
 
-      const inputAtIssue =
-        id_ref.current.value === '' || !idDupCheck ? id_ref
-          : pw_ref.current.value === '' ? pw_ref
-            : pw_ref.current.value !== pwConfirm_ref.current.value ? pwConfirm_ref
-              : name_ref.current.value === '' ? name_ref
-                : !emailDupCheck ? email_ref : tel_ref
-
-      inputAtIssue.current.focus()
+      switch (alertMsg) {
+        case '아이디를 입력해주세요' || '아이디 중복을 확인 해주세요':
+          { id_ref.current.focus(); break }
+        case '비밀번호를 입력해주세요':
+          { pw_ref.current.focus(); break }
+        case '비밀번호를 한번 더 입력해주세요' || '비밀번호 확인이 일치하지 않아요':
+          { pwConfirm_ref.current.focus(); break }
+        case '이메일 형식을 확인해주세요' || '이메일 중복을 확인 해주세요':
+          { email_ref.current.focus(); break }
+        case '이름을 입력해주세요':
+          { name_ref.current.focus(); break }
+        case '휴대폰 번호를 입력해주세요' || '휴대폰 번호 양식을 확인해주세요' :
+          { tel_ref.current.focus(); break }
+        default:
+          id_ref.current.focus()
+      }
     }
   }
 

@@ -31,9 +31,9 @@ const Login = (props) => {
       customAxios.post('/api/user/login', loginData)
       .then(response => {
         console.log(response)
-        // setCookie('token', response.data.token)
+        // setCookie('Authorization', response.data.token)
         // localStorage.setItem("refresh_token", response.data.refreshToken);
-        // console.log(localStorage.getItem("refresh_token"))
+        localStorage.setItem("Authorization", response.data.token);
       })
     }
   }

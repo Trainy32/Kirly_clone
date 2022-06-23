@@ -1,7 +1,8 @@
 import React from "react";
 import { useParams } from 'react-router-dom'
 
-import instance,{customAxios} from "../shared/Request";
+import axios from 'axios'
+import instance, {customAxios} from "../shared/Request";
 
 import { useDispatch, useSelector } from 'react-redux'
 import { add_cart_AX } from "../redux/modules/cart";
@@ -29,13 +30,9 @@ const Detail = (props) => {
   const [heartTogle, setHeartTogle] = React.useState(null)
 
   React.useEffect(() => {
-    customAxios.get('/api/product/' + params.productId)
+  customAxios.get('/api/product/' + params.productId)
   .then(response => setThisProduct(response.data))
-
-  // console.log('loading')
   }, [params.productId])
-
-  console.log(thisProduct)
 
   // 구매수량 체크
   const [qty, setQty] = React.useState(1)

@@ -2,12 +2,10 @@ export const setCookie = (cookie_name, value, miuntes = 5) => {
     const expTime = new Date();
     expTime.setMinutes( expTime.getMinutes() + miuntes )
     document.cookie = `${cookie_name}=${value}; exp=${expTime.toUTCString()}`;
-
-    console.log(expTime, expTime.toUTCString())
+    // console.log(expTime, expTime.toUTCString())
   }
 
 export const getCookie = (cookie_name) => {
-  console.log(cookie_name)
   let value = "; " + document.cookie;
   let parts = value.split(`; ${cookie_name}=`);
 

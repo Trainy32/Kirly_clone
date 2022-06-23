@@ -23,35 +23,34 @@ function Cart() {
   // 장바구니 정보 받아오기
   React.useEffect(() => {
     dispatch(load_cart_AX())
-    setSelectedItems(only_items.filter((item) => item && item.selected))
   }, [])
 
   const userCart = useSelector((state) => state.cart.list)
-  const only_items = userCart.map((category) => category.data).flat()
+  const selectedItems = useSelector((state) => state.cart.itemsOnly)
 
   // 전체 선택하기    
   const [isAllCheck, setIsAllCheck] = React.useState(true)
   const [checkChange, setCheckChange] = React.useState(isAllCheck)
 
+  
+  React.useEffect(() => {
+    setSelectedCount(selectedItems?.filter((item) => item.selected).length)
+  }, [])
+
   const allCheckAction = () =>{
     setIsAllCheck(!isAllCheck)
     setCheckChange(!isAllCheck)
   }
-
+  const [selectedCount, setSelectedCount] = React.useState(null)
   const TotalItemCount = userCart?.reduce((acc,category) => category.data ? acc + (category.data.length) : acc, 0)
 
-  const [selectedItems, setSelectedItems] = React.useState(null)
-
-  React.useEffect(() => {
-    setSelectedItems(only_items.filter((item) => item && item.selected))
-  }, [userCart])
 
   return (<>
     <Title>장바구니</Title>
     <Wrap>
       <CartContents>
         <Menu>
-          <span><CheckLabel isChecked={isAllCheck} setIsChecked={allCheckAction}>전체선택</CheckLabel>({selectedItems?.length}/{TotalItemCount})</span>
+          <span><CheckLabel isChecked={isAllCheck} setIsChecked={allCheckAction}>전체선택</CheckLabel>({selectedCount}/{TotalItemCount})</span>
           <hr />
           <span>선택삭제</span>
         </Menu>
@@ -72,7 +71,7 @@ function Cart() {
         }
 
         <Menu>
-        <span><CheckLabel isChecked={isAllCheck} setIsChecked={allCheckAction}>전체선택</CheckLabel>({selectedItems?.length}/{TotalItemCount})</span>
+        <span><CheckLabel isChecked={isAllCheck} setIsChecked={allCheckAction}>전체선택</CheckLabel>({selectedCount}/{TotalItemCount})</span>
           <hr />
           <span>선택삭제</span>
         </Menu>

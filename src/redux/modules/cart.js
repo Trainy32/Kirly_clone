@@ -1,5 +1,5 @@
 import axios from 'axios'
-import instance from '../../shared/Request'
+import instance, {customAxios} from '../../shared/Request'
 
 // 액션
 const LOAD = 'cart/LOAD'
@@ -18,8 +18,8 @@ export function load_local_cart(item_list) {
   return { type: LOADLOCAL, item_list }
 }
 
-export function select_item(item_data, is_selected) {
-  return { type: SELECT, item_data }
+export function select_item(item_id, is_selected) {
+  return { type: SELECT, item_id }
 }
 
 export function add_cart(item_data) {
@@ -37,19 +37,10 @@ export function delete_cart(delete_list) {
 //미들웨어
 export const load_cart_AX = () => {
   return function (dispatch) {
-    axios.get('http://localhost:5001/cart-test')
-      .then(response => {
-        const cartData = response.data.map((category) => {
-            if (category.result) {
-              const newData = category.data.map((item) => ({ ...item, selected: true }))
-              return { ...category, data: newData }
-            } else {
-              return category
-            }
-          }
-        )
-        dispatch(load_cart(cartData))
-      })
+    instance.get('/api/cart')
+      .then(response => { 
+        console.log(response)
+        dispatch(load_cart(response.data)) })
       .catch((err) => {
         console.log(err)
         window.alert('에러가 발생했어요 ㅠㅠ!')
@@ -70,8 +61,11 @@ export const load_local_cart_AX = () => {
 
 export const add_cart_AX = (item_data) => {
   return function (dispatch) {
-    axios.post('http://localhost:5001/cart-test?package=냉동', item_data)
-      .then(response => dispatch(load_cart(response.data)))
+    console.log(item_data)
+    instance.post('/api/cart/add/'+item_data.productId, {quantity:item_data.qty})
+      .then(response => {
+        console.log(response)
+        dispatch(load_cart(response.data))})
       .catch((err) => {
         console.log(err)
         window.alert('에러가 발생했어요 ㅠㅠ!')
@@ -109,14 +103,15 @@ export const delete_cart_AX = (delete_list) => {
 const initialState = {
   is_loaded: false,
   list: [{}],
-  selectedItems: [{}]
+  itemsOnly: [{}]
 }
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
     case 'cart/LOAD': {
-      const selected = state.list.filter((category)=> category.response).map((category) => category.data).flat()
-      return { ...state, is_loaded: true, list: action.item_list, selectedItems:selected }
+      const concatList = action.item_list.map((category) => category.data).flat().filter((item) => item)
+      const itemsList = concatList.map((item) => ({...item, selected:true}))
+      return { ...state, is_loaded: true, list: action.item_list, itemsOnly: itemsList}
     }
 
     case 'cart/LOADLOCAL': {
@@ -124,14 +119,8 @@ export default function reducer(state = initialState, action = {}) {
     }
 
     case 'cart/SELECT': {
-      const new_item_list = state.list.map((category) => {
-        if (category.package === action.item_data.package){
-          return category.data.map((item) => item.detailId === action.item_data.detailId ? {...item, selected: action.is_selected} : item)
-        }else {
-          return category
-        }
-      })
-      return { ...state, list: new_item_list }
+      const newItemsOnly = state.itemsOnly.map((item) => item.detailId === action.item_id ? {...item, selected:action.is_selected} : item)
+      return { ...state, itemsOnly: newItemsOnly}
     }
 
     case 'cart/Add': {
