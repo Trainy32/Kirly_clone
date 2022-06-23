@@ -122,9 +122,11 @@ const OrderOption = styled.span`
 `
 
 const List = styled.div`
-  margin: 10px auto 180px auto;
-  width:1050px;
+  margin: 10px 100px 180px;
+  width:1200px;
+  max-width:1200px;
   display: flex;
+  flex-wrap:wrap;
   justify-content:center;
 `
 

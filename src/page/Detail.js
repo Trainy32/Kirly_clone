@@ -49,11 +49,15 @@ const Detail = (props) => {
     qty: qty
   }
     dispatch(add_cart_AX(newCartItem))
+    window.alert('장바구니에 추가되었습니다')
+    setCartFooterOpen(false)
   }
 
   // 스크롤 메뉴를 위한 ref 
   const productDesc_ref = React.useRef(null)
   const productDetail_ref = React.useRef(null)
+
+  console.log(thisProduct)
 
   return (
     <>
@@ -61,7 +65,7 @@ const Detail = (props) => {
         <ScrollBtn />
         <RoundBtn size='small' onClick={() => console.log('ok')} style={{ position: 'absolute', top: '10px', right: '10px' }}><BiShareAlt /> </RoundBtn>
         <TitleArea>
-          <Thumb img_url={thisProduct?.introImage} />
+          <Thumb img_url={thisProduct?.thumb} />
           <TitleTexts>
             <h1>{thisProduct?.name}</h1>
             <h5>{thisProduct?.summary}</h5>
@@ -130,13 +134,14 @@ const Detail = (props) => {
         </StickyHeader>
 
         <ProductDetail>
-          <MainImage ref={productDesc_ref} img_url={thisProduct?.viewImage} />
+          <MainImage ref={productDesc_ref} img_url={thisProduct?.introImage} />
           <div>
             <h3>{thisProduct?.summary}</h3>
             <h2>{thisProduct?.name}</h2>
           </div>
           <hr />
           <p ref={productDetail_ref}>{thisProduct?.introDesc}</p>
+          <SubImage img_url={thisProduct?.viewImage}> </SubImage>
           {/* <AdditionalInfo src={process.env.PUBLIC_URL+'img/additionalInfo.jpg'} /> */}
           <AdditionalInfo src={'https://firebasestorage.googleapis.com/v0/b/mymagazinepjt.appspot.com/o/postImg%2F1655809001396?alt=media&token=484da4e3-f477-4bd8-96a5-ef769b0f1271'} />
         </ProductDetail>
@@ -312,6 +317,7 @@ const StickyHeader = styled.div`
   display:flex;
   width: 1010px;
   margin-top: 20px;
+  z-index: 100;
 
   div{
     display:flex;
@@ -372,6 +378,22 @@ const MainImage = styled.div`
 
   scroll-margin: 80px;
 `
+
+const SubImage = styled.div`
+  display:  ${(props) => props.img_url ? 'block' : 'none'};
+  background: ${(props) => props.img_url ? 'url(' + props.img_url + ')' : '#ddd'};
+  background-position: center;
+  background-size: contain;
+
+  width: 1010px;
+  height: 1000px;
+
+  margin: 100px auto;
+
+  scroll-margin: 80px;
+`
+
+
 const AdditionalInfo = styled.img`
   margin: 100px 0px;
   width: 1000px;

@@ -60,10 +60,11 @@ const CardList = () => {
 };
 
 const DivSt = styled.div`
-  width: 68%;
-  margin: auto;
+  width: 1300px;
+  margin-left: 230px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   font-family: 'Noto Sans KR', sans-serif;
 `;
 
@@ -72,6 +73,7 @@ const Div = styled.div`
     min-height: 100px;
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     font-size: 30px;

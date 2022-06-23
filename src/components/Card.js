@@ -58,7 +58,7 @@ const Card = (props) => {
 
 const DivSt = styled.div`
   width: 20%;
-  margin-right: 10%;
+  margin-right: 50px;
   display: flex;
   flex-direction: row;
   justify-content: center;

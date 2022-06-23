@@ -20,7 +20,7 @@ const Login = (props) => {
   const [secureLogin, setSecureLogin] = useState(true)
 
   const loginAction =  (e) => {
-    // e.preventDefault()
+    e.preventDefault()
 
     if (id_ref.current.value === '' || pw_ref.current.value === '') {
       window.alert('아이디 혹은 패스워드를 정확히 입력해주세요')
@@ -37,6 +37,8 @@ const Login = (props) => {
         // localStorage.setItem("refresh_token", response.data.refreshToken);
         dispatch(set_user(response.data.nickname))
         localStorage.setItem("authorization", response.data.token);
+
+        navigate('/')
       })
     }
   }
