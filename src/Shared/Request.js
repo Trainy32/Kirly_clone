@@ -2,7 +2,7 @@ import axios from "axios";
 import { getCookie } from "./Cookie";
 
 // let access_token = getCookie('Authorization')
-let user_token = localStorage.getItem("Authorization")
+let user_token = localStorage.getItem("authorization")
 
 
 const instance = axios.create({

@@ -98,27 +98,40 @@ const Signup = (props) => {
     }
   }
 
+  // 리스트 나타나게 하기
+  const [idTestList, setIdTestList] = React.useState(false)
+  const [pwTestList, setPwTestList] = React.useState(false)
+  const [pwCheckTestList, setPwCheckTestList] = React.useState(false)
+
 
   // 회원가입
   const signUpAction = () => {
-
-    const alertMsg =
-      id_ref.current.value === '' ? '아이디를 입력해주세요'
-        : !idDupCheck ? '아이디 중복을 확인 해주세요'
-          : pw_ref.current.value === '' ? '비밀번호를 입력해주세요'
-            : pwConfirm_ref.current.value === '' ? '비밀번호를 한번 더 입력해주세요'
-              : pw_ref.current.value !== pwConfirm_ref.current.value ? '비밀번호 확인이 일치하지 않아요'
-                : name_ref.current.value === '' ? '이름을 입력해주세요'
-                  : email_ref.current.value === '' ? '이메일 형식을 확인해주세요'
-                    : !emailDupCheck ? '이메일 중복을 확인 해주세요'
-                      : tel_ref.current.value === '' ? '휴대폰 번호를 입력해주세요'
-                        : tel_ref.current.value.substr(0, 3) !== '010' ? '휴대폰 번호 양식을 확인해주세요'
-                          : !address ? '주소를 입력해주세요'
-                            : !requiredCheck ? '필수 동의 항목에 체크해주세요'
-                              : 'pass'
-
-
-    if (alertMsg === 'pass') {
+    if (!idFormCheck) {
+      window.alert('아이디를 입력해주세요')
+      id_ref.current.focus()
+    } else if (!idDupCheck) {
+      window.alert('아이디 중복을 확인 해주세요')
+      id_ref.current.focus()
+    } else if (!pwLengthCheck || !pwFormCheck || !pwRepeatLetterCheck) {
+      window.alert('비밀번호를 확인해주세요')
+      pw_ref.current.focus()
+    } else if (pw_ref.current.value !== pwConfirm_ref.current.value) {
+      window.alert('비밀번호 확인이 일치하지 않아요')
+      pwConfirm_ref.current.focus()
+    } else if (name_ref.current.value === '') {
+      window.alert('이름을 입력해주세요')
+      name_ref.current.focus()
+    } else if (!emailDupCheck) {
+      window.alert('이메일 중복을 확인 해주세요')
+      email_ref.current.focus()
+    } else if (tel_ref.current.value.substr(0, 3) !== '010') {
+      window.alert('휴대폰 번호 양식을 확인해주세요')
+      tel_ref.current.focus()
+    } else if (!address) {
+      window.alert('주소를 입력해주세요')
+    } else if (!requiredCheck) {
+      window.alert('필수 동의 항목에 체크해주세요')
+    } else {
       const userData = {
         username: id_ref.current.value,
         password: pwConfirm_ref.current.value,
@@ -129,39 +142,18 @@ const Signup = (props) => {
         addressDetail: subAddress_ref.current.value,
         zonecode: address.zoneCode
       }
-
-      customAxios.post('/api/user/signup', userData)
-        .then(response => {
-          if (response.data.result) {
-            window.alert('가입을 축하드립니다')
-            navigate('/login')
-          }
-          console.log(response)
-        })
-        .catch((err) => {
-          window.alert('에러가 발생했어요!')
-          console.log(err)
-        })
-
-    } else {
-      window.alert(alertMsg)
-
-      switch (alertMsg) {
-        case '아이디를 입력해주세요' || '아이디 중복을 확인 해주세요':
-          { id_ref.current.focus(); break }
-        case '비밀번호를 입력해주세요':
-          { pw_ref.current.focus(); break }
-        case '비밀번호를 한번 더 입력해주세요' || '비밀번호 확인이 일치하지 않아요':
-          { pwConfirm_ref.current.focus(); break }
-        case '이메일 형식을 확인해주세요' || '이메일 중복을 확인 해주세요':
-          { email_ref.current.focus(); break }
-        case '이름을 입력해주세요':
-          { name_ref.current.focus(); break }
-        case '휴대폰 번호를 입력해주세요' || '휴대폰 번호 양식을 확인해주세요' :
-          { tel_ref.current.focus(); break }
-        default:
-          id_ref.current.focus()
-      }
+    customAxios.post('/api/user/signup', userData)
+      .then(response => {
+        if (response.data.result) {
+          window.alert('가입을 축하드립니다')
+          navigate('/login')
+        }
+        console.log(response)
+      })
+      .catch((err) => {
+        window.alert('에러가 발생했어요!')
+        console.log(err)
+      })
     }
   }
 
@@ -230,8 +222,7 @@ const Signup = (props) => {
             <tr>
               <th> <h4>아이디<RedStar>*</RedStar></h4> </th>
               <td> <input ref={id_ref} type='text' onChange={(e) => checkId(e)} placeholder="6자 이상의 영문 혹은 영문과 숫자를 조합" />
-                {/* <ValidityList displayed={'none'}> */}
-                <ValidityList>
+                <ValidityList show={idTestList} onFocus={()=>setIdTestList(true)}>
                   <ValidityInfo is_valid={idFormCheck}>6자 이상의 영문 혹은 영문과 숫자를 조합</ValidityInfo>
                   <ValidityInfo is_valid={idDupCheck}>아이디 중복확인</ValidityInfo>
                 </ValidityList>
@@ -242,7 +233,7 @@ const Signup = (props) => {
             <tr>
               <th><h4>비밀번호<RedStar>*</RedStar></h4></th>
               <td><input ref={pw_ref} onChange={(e) => checkPw(e)} type='password' placeholder="비밀번호를 입력해주세요" />
-                <ValidityList>
+                <ValidityList show={pwTestList} onFocus={()=>setPwTestList(true)}>
                   <ValidityInfo is_valid={pwLengthCheck}>10자 이상 입력</ValidityInfo>
                   <ValidityInfo is_valid={pwFormCheck} >영문/숫자/특수문자(공백제외)만 허용하며, 2개 이상 조합</ValidityInfo>
                   <ValidityInfo is_valid={pwRepeatLetterCheck}>동일한 숫자 3개 이상 연속 사용 불가</ValidityInfo>
@@ -255,7 +246,7 @@ const Signup = (props) => {
               <td><input ref={pwConfirm_ref} onChange={(e) => setPwConfirmCheck(pwConfirm_ref.current?.value === pw_ref.current?.value && pwConfirm_ref.current?.value !== '')}
                 type='password' placeholder="비밀번호를 한번 더 입력해주세요" />
 
-                <ValidityList>
+                <ValidityList show={pwCheckTestList} onFocus={()=>setPwCheckTestList(true)}>
                   <ValidityInfo is_valid={PwConfirmCheck}>
                     동일한 비밀번호를 입력해주세요.</ValidityInfo>
                 </ValidityList>

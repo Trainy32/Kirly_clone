@@ -33,7 +33,7 @@ const Login = (props) => {
         console.log(response)
         // setCookie('Authorization', response.data.token)
         // localStorage.setItem("refresh_token", response.data.refreshToken);
-        localStorage.setItem("Authorization", response.data.token);
+        localStorage.setItem("authorization", response.data.token);
       })
     }
   }

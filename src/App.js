@@ -12,6 +12,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Main from "./page/Main";
 import Cart from "./page/Cart";
+import Category from "./page/Category";
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
         <Route path='/detail/:productId' element={<Detail isLogin={isLogin} />} />
+        <Route path='/category/:categoryNo' element={<Category isLogin={isLogin} />} />
         <Route path='/cart' element={<Cart isLogin={isLogin} />} />
       </Routes>
       <Footer/>
